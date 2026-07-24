@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact — LA MAISON</title>
+    <meta name="description" content="LA MAISON — maison de mode béninoise. Découvrez nos collections : robes, accessoires et pièces artisanales. Livraison au Bénin et à l’international, paiement sécurisé KKiaPay.">
+    <link rel="icon" type="image/jpeg" href="http://127.0.0.1:8899/images/olori.jpeg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="http://127.0.0.1:8899/css/app.css">
+<script id="browser-logger-active">
+(function() {
+    const ENDPOINT = 'http://127.0.0.1:8899/_boost/browser-logs';
+    const logQueue = [];
+    let flushTimeout = null;
+
+    console.log('🔍 Browser logger active (MCP server detected). Posting to: ' + ENDPOINT);
+
+    // Store original console methods
+    const originalConsole = {
+        log: console.log,
+        info: console.info,
+        error: console.error,
+        warn: console.warn,
+        table: console.table
+    };
+
+    // Helper to safely stringify values
+    function safeStringify(obj) {
+        const seen = new WeakSet();
+        return JSON.stringify(obj, (key, value) => {
+            if (typeof value === 'object' && value !== null) {
+                if (seen.has(value)) return '[Circular]';
+                seen.add(value);
+            }
+            if (value instanceof Error) {
+                return {
+                    name: value.name,
+                    message: value.message,
+                    stack: value.stack
+                };
+            }
+            return value;
+        });
+    }
+
+    // Batch and send logs
+    function flushLogs() {
+        if (logQueue.length === 0) return;
+
+        const batch = logQueue.splice(0, logQueue.length);
+
+        fetch(ENDPOINT, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({ logs: batch })
+        }).catch(err => {
+            // Silently fail to avoid infinite loops
+            originalConsole.error('Failed to send logs:', err);
+        });
+    }
+
+    // Debounced flush (100ms)
+    function scheduleFlush() {
+        if (flushTimeout) clearTimeout(flushTimeout);
+        flushTimeout = setTimeout(flushLogs, 100);
+    }
+
+    // Intercept console methods
+    ['log', 'info', 'error', 'warn', 'table'].forEach(method => {
+        console[method] = function(...args) {
+            // Call original method
+            originalConsole[method].apply(console, args);
+
+            // Capture log data
+            try {
+                logQueue.push({
+                    type: method,
+                    timestamp: new Date().toISOString(),
+                    data: args.map(arg => {
+                        try {
+                            return typeof arg === 'object' ? JSON.parse(safeStringify(arg)) : arg;
+                        } catch (e) {
+                            return String(arg);
+                        }
+                    }),
+                    url: window.location.href,
+                    userAgent: navigator.userAgent
+                });
+
+                scheduleFlush();
+            } catch (e) {
+                // Fail silently
+            }
+        };
+    });
+
+    // Global error handlers for uncaught errors
+    const originalOnError = window.onerror;
+    window.onerror = function boostErrorHandler(errorMsg, url, lineNumber, colNumber, error) {
+        try {
+            logQueue.push({
+                type: 'uncaught_error',
+                timestamp: new Date().toISOString(),
+                data: [{
+                    message: errorMsg,
+                    filename: url,
+                    lineno: lineNumber,
+                    colno: colNumber,
+                    error: error ? {
+                        name: error.name,
+                        message: error.message,
+                        stack: error.stack
+                    } : null
+                }],
+                url: window.location.href,
+                userAgent: navigator.userAgent
+            });
+
+            scheduleFlush();
+        } catch (e) {
+            // Fail silently
+        }
+
+        // Call original handler if it exists
+        if (originalOnError && typeof originalOnError === 'function') {
+            return originalOnError(errorMsg, url, lineNumber, colNumber, error);
+        }
+
+        // Let the error continue to propagate
+        return false;
+    }
+    window.addEventListener('error', (event) => {
+        try {
+            logQueue.push({
+                type: 'window_error',
+                timestamp: new Date().toISOString(),
+                data: [{
+                    message: event.message,
+                    filename: event.filename,
+                    lineno: event.lineno,
+                    colno: event.colno,
+                    error: event.error ? {
+                        name: event.error.name,
+                        message: event.error.message,
+                        stack: event.error.stack
+                    } : null
+                }],
+                url: window.location.href,
+                userAgent: navigator.userAgent
+            });
+
+            scheduleFlush();
+        } catch (e) {
+            // Fail silently
+        }
+
+        // Let the error continue to propagate
+        return false;
+    });
+    window.addEventListener('unhandledrejection', (event) => {
+        try {
+            logQueue.push({
+                type: 'error',
+                timestamp: new Date().toISOString(),
+                data: [{
+                    message: 'Unhandled Promise Rejection',
+                    reason: event.reason instanceof Error ? {
+                        name: event.reason.name,
+                        message: event.reason.message,
+                        stack: event.reason.stack
+                    } : event.reason
+                }],
+                url: window.location.href,
+                userAgent: navigator.userAgent
+            });
+
+            scheduleFlush();
+        } catch (e) {
+            // Fail silently
+        }
+
+        // Let the rejection continue to propagate
+        return false;
+    });
+
+    // Flush on page unload
+    window.addEventListener('beforeunload', () => {
+        if (logQueue.length > 0) {
+            navigator.sendBeacon(ENDPOINT, JSON.stringify({ logs: logQueue }));
+        }
+    });
+})();
+</script>
+</head>
+<body class="">
+
+<div class="site-top">
+<div class="topbar">Livraison offerte à Cotonou dès 50 000 FCFA — Paiement sécurisé KKiaPay</div>
+
+<header class="site-header">
+    <div class="inner">
+        <button class="burger" aria-label="Ouvrir le menu" aria-expanded="false">☰</button>
+        <a class="brand" href="http://127.0.0.1:8899">
+            <img class="brand-logo" src="http://127.0.0.1:8899/images/olori.png" alt="LA MAISON — Olori "  >
+        </a>
+        <nav class="nav" aria-label="Navigation principale">
+            <a href="http://127.0.0.1:8899" class="">Accueil</a>
+            <a href="http://127.0.0.1:8899/boutique" class="">Boutique</a>
+            <a href="http://127.0.0.1:8899/boutique?categorie=collection-ete">Collections</a>
+            <a href="http://127.0.0.1:8899/a-propos" class="">À propos</a>
+            <a href="http://127.0.0.1:8899/contact" class="active">Contact</a>
+        </nav>
+        <div class="header-icons">
+            <a href="http://127.0.0.1:8899/boutique" aria-label="Rechercher"><span class="material-symbols-outlined">search</span></a>
+                            <a href="http://127.0.0.1:8899/login" aria-label="Connexion"><span class="material-symbols-outlined">person</span></a>
+                        <a class="cart-link" href="http://127.0.0.1:8899/panier" aria-label="Panier"><span class="material-symbols-outlined">shopping_bag</span></a>
+        </div>
+    </div>
+</header>
+</div>
+
+
+<main>
+    <section class="section">
+    <div class="container">
+        <div class="section-head">
+            <div>
+                <span class="eyebrow">Nous écrire</span>
+                <h2>Contact</h2>
+            </div>
+        </div>
+
+        <div class="checkout-layout">
+            <form method="POST" action="http://127.0.0.1:8899/contact">
+                <input type="hidden" name="_token" value="yq89GlXCe10xLPy5q2yONA1B0qyIN1O8Sv81VgYB" autocomplete="off">                <div class="form-grid">
+                    <div class="field"><label for="cname">Nom</label><input id="cname" name="name" required></div>
+                    <div class="field"><label for="cmail">Email</label><input id="cmail" name="email" type="email" required></div>
+                    <div class="field full"><label for="csubj">Sujet</label><input id="csubj" name="subject" placeholder="Question sur une commande, un produit…"></div>
+                    <div class="field full"><label for="cmsg">Message</label><textarea id="cmsg" name="message" rows="6" required></textarea></div>
+                </div>
+                <button class="btn btn-terra" type="submit" style="margin-top:18px">Envoyer le message</button>
+            </form>
+
+            <aside class="panel">
+                <h3>Nos coordonnées</h3>
+                <p style="font-size:15px;line-height:2">
+                    Cotonou, Quartier Menontin<br>
+                    contact@lamaison.bj<br>
+                    +229 97 00 00 00<br><br>
+                    <strong>Réseaux sociaux</strong><br>
+                    Instagram · Facebook · TikTok
+                </p>
+                <h3 style="margin-top:22px">FAQ</h3>
+                <div class="accordion">
+                    <details><summary>Quels sont les délais de livraison ?</summary><div class="body">48 h à Cotonou, 3 à 5 jours au Bénin, 7 à 12 jours à l'international.</div></details>
+                    <details><summary>Comment payer ma commande ?</summary><div class="body">Par KKiaPay (Mobile Money, carte bancaire) ou à la livraison à Cotonou.</div></details>
+                    <details><summary>Puis-je retourner un article ?</summary><div class="body">Oui, sous 7 jours après réception, article non porté.</div></details>
+                </div>
+            </aside>
+        </div>
+    </div>
+</section>
+</main>
+
+<footer class="site-footer">
+    <div class="inner">
+        <div>
+            <img class="brand-logo footer-logo" src="http://127.0.0.1:8899/images/olori.JPEG" alt="LA MAISON — Olori">
+            <p>Maison de mode béninoise. Élégance, authenticité et savoir-faire, de Cotonou au monde entier.</p>
+        </div>
+        <div>
+            <h4>Boutique</h4>
+            <a href="http://127.0.0.1:8899/boutique?categorie=robes">Robes</a>
+            <a href="http://127.0.0.1:8899/boutique?categorie=accessoires">Accessoires</a>
+            <a href="http://127.0.0.1:8899/boutique?categorie=collection-ete">Collection été</a>
+        </div>
+        <div>
+            <h4>Aide</h4>
+            <a href="http://127.0.0.1:8899/contact">Contact & FAQ</a>
+            <a href="#">Livraison & retours</a>
+            <a href="#">Guide des tailles</a>
+        </div>
+        <div>
+            <h4>Suivez-nous</h4>
+            <a href="#">Instagram</a>
+            <a href="#">Facebook</a>
+            <a href="#">TikTok</a>
+        </div>
+    </div>
+    <div class="footer-bottom">© 2026 La Maison — Cotonou, Bénin · Paiement sécurisé KKiaPay · Mentions légales</div>
+</footer>
+
+<script src="http://127.0.0.1:8899/js/app.js"></script>
+</body>
+</html>

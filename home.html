@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LA MAISON — Mode béninoise, robes et accessoires</title>
+    <meta name="description" content="LA MAISON — maison de mode béninoise. Découvrez nos collections : robes, accessoires et pièces artisanales. Livraison au Bénin et à l’international, paiement sécurisé KKiaPay.">
+    <link rel="icon" type="image/jpeg" href="http://127.0.0.1:8899/images/olori.jpeg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="http://127.0.0.1:8899/css/app.css">
+<script id="browser-logger-active">
+(function() {
+    const ENDPOINT = 'http://127.0.0.1:8899/_boost/browser-logs';
+    const logQueue = [];
+    let flushTimeout = null;
+
+    console.log('🔍 Browser logger active (MCP server detected). Posting to: ' + ENDPOINT);
+
+    // Store original console methods
+    const originalConsole = {
+        log: console.log,
+        info: console.info,
+        error: console.error,
+        warn: console.warn,
+        table: console.table
+    };
+
+    // Helper to safely stringify values
+    function safeStringify(obj) {
+        const seen = new WeakSet();
+        return JSON.stringify(obj, (key, value) => {
+            if (typeof value === 'object' && value !== null) {
+                if (seen.has(value)) return '[Circular]';
+                seen.add(value);
+            }
+            if (value instanceof Error) {
+                return {
+                    name: value.name,
+                    message: value.message,
+                    stack: value.stack
+                };
+            }
+            return value;
+        });
+    }
+
+    // Batch and send logs
+    function flushLogs() {
+        if (logQueue.length === 0) return;
+
+        const batch = logQueue.splice(0, logQueue.length);
+
+        fetch(ENDPOINT, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({ logs: batch })
+        }).catch(err => {
+            // Silently fail to avoid infinite loops
+            originalConsole.error('Failed to send logs:', err);
+        });
+    }
+
+    // Debounced flush (100ms)
+    function scheduleFlush() {
+        if (flushTimeout) clearTimeout(flushTimeout);
+        flushTimeout = setTimeout(flushLogs, 100);
+    }
+
+    // Intercept console methods
+    ['log', 'info', 'error', 'warn', 'table'].forEach(method => {
+        console[method] = function(...args) {
+            // Call original method
+            originalConsole[method].apply(console, args);
+
+            // Capture log data
+            try {
+                logQueue.push({
+                    type: method,
+                    timestamp: new Date().toISOString(),
+                    data: args.map(arg => {
+                        try {
+                            return typeof arg === 'object' ? JSON.parse(safeStringify(arg)) : arg;
+                        } catch (e) {
+                            return String(arg);
+                        }
+                    }),
+                    url: window.location.href,
+                    userAgent: navigator.userAgent
+                });
+
+                scheduleFlush();
+            } catch (e) {
+                // Fail silently
+            }
+        };
+    });
+
+    // Global error handlers for uncaught errors
+    const originalOnError = window.onerror;
+    window.onerror = function boostErrorHandler(errorMsg, url, lineNumber, colNumber, error) {
+        try {
+            logQueue.push({
+                type: 'uncaught_error',
+                timestamp: new Date().toISOString(),
+                data: [{
+                    message: errorMsg,
+                    filename: url,
+                    lineno: lineNumber,
+                    colno: colNumber,
+                    error: error ? {
+                        name: error.name,
+                        message: error.message,
+                        stack: error.stack
+                    } : null
+                }],
+                url: window.location.href,
+                userAgent: navigator.userAgent
+            });
+
+            scheduleFlush();
+        } catch (e) {
+            // Fail silently
+        }
+
+        // Call original handler if it exists
+        if (originalOnError && typeof originalOnError === 'function') {
+            return originalOnError(errorMsg, url, lineNumber, colNumber, error);
+        }
+
+        // Let the error continue to propagate
+        return false;
+    }
+    window.addEventListener('error', (event) => {
+        try {
+            logQueue.push({
+                type: 'window_error',
+                timestamp: new Date().toISOString(),
+                data: [{
+                    message: event.message,
+                    filename: event.filename,
+                    lineno: event.lineno,
+                    colno: event.colno,
+                    error: event.error ? {
+                        name: event.error.name,
+                        message: event.error.message,
+                        stack: event.error.stack
+                    } : null
+                }],
+                url: window.location.href,
+                userAgent: navigator.userAgent
+            });
+
+            scheduleFlush();
+        } catch (e) {
+            // Fail silently
+        }
+
+        // Let the error continue to propagate
+        return false;
+    });
+    window.addEventListener('unhandledrejection', (event) => {
+        try {
+            logQueue.push({
+                type: 'error',
+                timestamp: new Date().toISOString(),
+                data: [{
+                    message: 'Unhandled Promise Rejection',
+                    reason: event.reason instanceof Error ? {
+                        name: event.reason.name,
+                        message: event.reason.message,
+                        stack: event.reason.stack
+                    } : event.reason
+                }],
+                url: window.location.href,
+                userAgent: navigator.userAgent
+            });
+
+            scheduleFlush();
+        } catch (e) {
+            // Fail silently
+        }
+
+        // Let the rejection continue to propagate
+        return false;
+    });
+
+    // Flush on page unload
+    window.addEventListener('beforeunload', () => {
+        if (logQueue.length > 0) {
+            navigator.sendBeacon(ENDPOINT, JSON.stringify({ logs: logQueue }));
+        }
+    });
+})();
+</script>
+</head>
+<body class="nav-over-hero">
+
+<div class="site-top">
+<div class="topbar">Livraison offerte à Cotonou dès 50 000 FCFA — Paiement sécurisé KKiaPay</div>
+
+<header class="site-header">
+    <div class="inner">
+        <button class="burger" aria-label="Ouvrir le menu" aria-expanded="false">☰</button>
+        <a class="brand" href="http://127.0.0.1:8899">
+            <img class="brand-logo" src="http://127.0.0.1:8899/images/olori.png" alt="LA MAISON — Olori "  >
+        </a>
+        <nav class="nav" aria-label="Navigation principale">
+            <a href="http://127.0.0.1:8899" class="active">Accueil</a>
+            <a href="http://127.0.0.1:8899/boutique" class="">Boutique</a>
+            <a href="http://127.0.0.1:8899/boutique?categorie=collection-ete">Collections</a>
+            <a href="http://127.0.0.1:8899/a-propos" class="">À propos</a>
+            <a href="http://127.0.0.1:8899/contact" class="">Contact</a>
+        </nav>
+        <div class="header-icons">
+            <a href="http://127.0.0.1:8899/boutique" aria-label="Rechercher"><span class="material-symbols-outlined">search</span></a>
+                            <a href="http://127.0.0.1:8899/login" aria-label="Connexion"><span class="material-symbols-outlined">person</span></a>
+                        <a class="cart-link" href="http://127.0.0.1:8899/panier" aria-label="Panier"><span class="material-symbols-outlined">shopping_bag</span></a>
+        </div>
+    </div>
+</header>
+</div>
+
+
+<main>
+    
+
+<section class="hero">
+    <video class="hero-bg" autoplay muted loop playsinline preload="metadata"
+           poster="http://127.0.0.1:8899/images/olori.jpeg">
+        <source src="http://127.0.0.1:8899/videos/mode.mp4" type="video/mp4">
+    </video>
+    <div class="hero-overlay"></div>
+    <div class="inner">
+        <div class="hero-content">
+            <span class="eyebrow">Nouvelle collection · Été 2026</span>
+            <h1>L'élégance,<br><em>l'authenticité</em>,<br>la modernité.</h1>
+            <p class="lead">Des pièces dessinées et confectionnées à Cotonou, pensées pour vous accompagner du quotidien aux grandes occasions.</p>
+            <div class="hero-cta">
+                <a class="btn btn-solid" href="http://127.0.0.1:8899/boutique">Découvrir la collection</a>
+                <a class="hero-link" href="http://127.0.0.1:8899/a-propos">Notre histoire <span class="material-symbols-outlined" style="font-size:18px">arrow_forward</span></a>
+            </div>
+        </div>
+    </div>
+    <span class="scroll-cue">Défiler</span>
+</section>
+
+
+<section class="reassurance reveal">
+    <div class="inner">
+        <div class="item"><span class="material-symbols-outlined">local_shipping</span><strong>Livraison Bénin & international</strong><span>Suivi de commande en temps réel</span></div>
+        <div class="item"><span class="material-symbols-outlined">verified_user</span><strong>Paiement sécurisé</strong><span>KKiaPay — Mobile Money, carte bancaire</span></div>
+        <div class="item"><span class="material-symbols-outlined">payments</span><strong>Paiement à la livraison</strong><span>Disponible selon la zone de livraison</span></div>
+    </div>
+</section>
+
+
+<section class="section reveal">
+    <div class="container">
+        <div class="section-head">
+            <div>
+                <span class="eyebrow">Explorer</span>
+                <h2>Nos catégories</h2>
+            </div>
+        </div>
+                <div class="cat-grid">
+                            <a class="cat-card" href="http://127.0.0.1:8899/boutique?categorie=robes">
+                                            <img class="cat-img" src="http://127.0.0.1:8899/images/categories/robes.jpg" alt="Robes" loading="lazy">
+                                        <span class="label">Robes</span>
+                </a>
+                            <a class="cat-card" href="http://127.0.0.1:8899/boutique?categorie=accessoires">
+                                            <img class="cat-img" src="http://127.0.0.1:8899/images/categories/accessoires.jpg" alt="Accessoires" loading="lazy">
+                                        <span class="label">Accessoires</span>
+                </a>
+                            <a class="cat-card" href="http://127.0.0.1:8899/boutique?categorie=collection-ete">
+                                            <img class="cat-img" src="http://127.0.0.1:8899/images/categories/ete.jpg" alt="Collection été" loading="lazy">
+                                        <span class="label">Collection été</span>
+                </a>
+                    </div>
+    </div>
+</section>
+
+
+<section class="section reveal" style="padding-top:0">
+    <div class="container">
+        <div class="section-head">
+            <div>
+                <span class="eyebrow">Fraîchement arrivées</span>
+                <h2>Nouveautés</h2>
+            </div>
+            <a class="link-more" href="http://127.0.0.1:8899/boutique">Voir toute la boutique</a>
+        </div>
+        <div class="product-grid">
+                            <a class="product-card" href="http://127.0.0.1:8899/produit/robe-ife">
+            <span class="badge ">Nouveau</span>
+        <div class="ph ph-terra">I</div>
+    <div class="info">
+        <div class="name">Robe Ifè</div>
+        <div class="price">
+            28 000 FCFA
+                    </div>
+    </div>
+</a>
+                            <a class="product-card" href="http://127.0.0.1:8899/produit/ensemble-adjara">
+            <span class="badge promo">Promo</span>
+        <div class="ph ph-sable">A</div>
+    <div class="info">
+        <div class="name">Ensemble Adjara</div>
+        <div class="price">
+            35 000 FCFA
+                            <span class="old">42 000 FCFA</span>
+                    </div>
+    </div>
+</a>
+                            <a class="product-card" href="http://127.0.0.1:8899/produit/sac-kefa">
+        <div class="ph ph-rose">K</div>
+    <div class="info">
+        <div class="name">Sac Kéfa</div>
+        <div class="price">
+            18 500 FCFA
+                    </div>
+    </div>
+</a>
+                            <a class="product-card" href="http://127.0.0.1:8899/produit/boubou-seme">
+            <span class="badge ">Édition limitée</span>
+        <div class="ph ph-vert">S</div>
+    <div class="info">
+        <div class="name">Boubou Sèmè</div>
+        <div class="price">
+            45 000 FCFA
+                    </div>
+    </div>
+</a>
+                    </div>
+    </div>
+</section>
+
+
+<section class="editorial reveal">
+    <div class="inner">
+        <span class="eyebrow">Notre histoire</span>
+        <h2>« Chaque pièce raconte un savoir-faire transmis de main en main. »</h2>
+        <p>Découvrez l'univers de la maison, ses valeurs et ses artisanes partenaires.</p>
+        <a class="btn" style="border-color:#F4F1E9;color:#F4F1E9" href="http://127.0.0.1:8899/a-propos">À propos de la maison</a>
+    </div>
+</section>
+
+</main>
+
+<footer class="site-footer">
+    <div class="inner">
+        <div>
+            <img class="brand-logo footer-logo" src="http://127.0.0.1:8899/images/olori.JPEG" alt="LA MAISON — Olori">
+            <p>Maison de mode béninoise. Élégance, authenticité et savoir-faire, de Cotonou au monde entier.</p>
+        </div>
+        <div>
+            <h4>Boutique</h4>
+            <a href="http://127.0.0.1:8899/boutique?categorie=robes">Robes</a>
+            <a href="http://127.0.0.1:8899/boutique?categorie=accessoires">Accessoires</a>
+            <a href="http://127.0.0.1:8899/boutique?categorie=collection-ete">Collection été</a>
+        </div>
+        <div>
+            <h4>Aide</h4>
+            <a href="http://127.0.0.1:8899/contact">Contact & FAQ</a>
+            <a href="#">Livraison & retours</a>
+            <a href="#">Guide des tailles</a>
+        </div>
+        <div>
+            <h4>Suivez-nous</h4>
+            <a href="#">Instagram</a>
+            <a href="#">Facebook</a>
+            <a href="#">TikTok</a>
+        </div>
+    </div>
+    <div class="footer-bottom">© 2026 La Maison — Cotonou, Bénin · Paiement sécurisé KKiaPay · Mentions légales</div>
+</footer>
+
+<script src="http://127.0.0.1:8899/js/app.js"></script>
+</body>
+</html>

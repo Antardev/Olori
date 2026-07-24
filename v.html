@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue 360° — LA MAISON</title>
+    <meta name="description" content="LA MAISON — maison de mode béninoise. Découvrez nos collections : robes, accessoires et pièces artisanales. Livraison au Bénin et à l’international, paiement sécurisé KKiaPay.">
+    <link rel="icon" type="image/jpeg" href="http://127.0.0.1:8899/images/olori.jpeg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="http://127.0.0.1:8899/css/app.css">
+<script id="browser-logger-active">
+(function() {
+    const ENDPOINT = 'http://127.0.0.1:8899/_boost/browser-logs';
+    const logQueue = [];
+    let flushTimeout = null;
+
+    console.log('🔍 Browser logger active (MCP server detected). Posting to: ' + ENDPOINT);
+
+    // Store original console methods
+    const originalConsole = {
+        log: console.log,
+        info: console.info,
+        error: console.error,
+        warn: console.warn,
+        table: console.table
+    };
+
+    // Helper to safely stringify values
+    function safeStringify(obj) {
+        const seen = new WeakSet();
+        return JSON.stringify(obj, (key, value) => {
+            if (typeof value === 'object' && value !== null) {
+                if (seen.has(value)) return '[Circular]';
+                seen.add(value);
+            }
+            if (value instanceof Error) {
+                return {
+                    name: value.name,
+                    message: value.message,
+                    stack: value.stack
+                };
+            }
+            return value;
+        });
+    }
+
+    // Batch and send logs
+    function flushLogs() {
+        if (logQueue.length === 0) return;
+
+        const batch = logQueue.splice(0, logQueue.length);
+
+        fetch(ENDPOINT, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({ logs: batch })
+        }).catch(err => {
+            // Silently fail to avoid infinite loops
+            originalConsole.error('Failed to send logs:', err);
+        });
+    }
+
+    // Debounced flush (100ms)
+    function scheduleFlush() {
+        if (flushTimeout) clearTimeout(flushTimeout);
+        flushTimeout = setTimeout(flushLogs, 100);
+    }
+
+    // Intercept console methods
+    ['log', 'info', 'error', 'warn', 'table'].forEach(method => {
+        console[method] = function(...args) {
+            // Call original method
+            originalConsole[method].apply(console, args);
+
+            // Capture log data
+            try {
+                logQueue.push({
+                    type: method,
+                    timestamp: new Date().toISOString(),
+                    data: args.map(arg => {
+                        try {
+                            return typeof arg === 'object' ? JSON.parse(safeStringify(arg)) : arg;
+                        } catch (e) {
+                            return String(arg);
+                        }
+                    }),
+                    url: window.location.href,
+                    userAgent: navigator.userAgent
+                });
+
+                scheduleFlush();
+            } catch (e) {
+                // Fail silently
+            }
+        };
+    });
+
+    // Global error handlers for uncaught errors
+    const originalOnError = window.onerror;
+    window.onerror = function boostErrorHandler(errorMsg, url, lineNumber, colNumber, error) {
+        try {
+            logQueue.push({
+                type: 'uncaught_error',
+                timestamp: new Date().toISOString(),
+                data: [{
+                    message: errorMsg,
+                    filename: url,
+                    lineno: lineNumber,
+                    colno: colNumber,
+                    error: error ? {
+                        name: error.name,
+                        message: error.message,
+                        stack: error.stack
+                    } : null
+                }],
+                url: window.location.href,
+                userAgent: navigator.userAgent
+            });
+
+            scheduleFlush();
+        } catch (e) {
+            // Fail silently
+        }
+
+        // Call original handler if it exists
+        if (originalOnError && typeof originalOnError === 'function') {
+            return originalOnError(errorMsg, url, lineNumber, colNumber, error);
+        }
+
+        // Let the error continue to propagate
+        return false;
+    }
+    window.addEventListener('error', (event) => {
+        try {
+            logQueue.push({
+                type: 'window_error',
+                timestamp: new Date().toISOString(),
+                data: [{
+                    message: event.message,
+                    filename: event.filename,
+                    lineno: event.lineno,
+                    colno: event.colno,
+                    error: event.error ? {
+                        name: event.error.name,
+                        message: event.error.message,
+                        stack: event.error.stack
+                    } : null
+                }],
+                url: window.location.href,
+                userAgent: navigator.userAgent
+            });
+
+            scheduleFlush();
+        } catch (e) {
+            // Fail silently
+        }
+
+        // Let the error continue to propagate
+        return false;
+    });
+    window.addEventListener('unhandledrejection', (event) => {
+        try {
+            logQueue.push({
+                type: 'error',
+                timestamp: new Date().toISOString(),
+                data: [{
+                    message: 'Unhandled Promise Rejection',
+                    reason: event.reason instanceof Error ? {
+                        name: event.reason.name,
+                        message: event.reason.message,
+                        stack: event.reason.stack
+                    } : event.reason
+                }],
+                url: window.location.href,
+                userAgent: navigator.userAgent
+            });
+
+            scheduleFlush();
+        } catch (e) {
+            // Fail silently
+        }
+
+        // Let the rejection continue to propagate
+        return false;
+    });
+
+    // Flush on page unload
+    window.addEventListener('beforeunload', () => {
+        if (logQueue.length > 0) {
+            navigator.sendBeacon(ENDPOINT, JSON.stringify({ logs: logQueue }));
+        }
+    });
+})();
+</script>
+</head>
+<body>
+
+<div class="topbar">Livraison offerte à Cotonou dès 50 000 FCFA — Paiement sécurisé KKiaPay</div>
+
+<header class="site-header">
+    <div class="inner">
+        <button class="burger" aria-label="Ouvrir le menu" aria-expanded="false">☰</button>
+        <a class="brand" href="http://127.0.0.1:8899">
+            <img class="brand-logo" src="http://127.0.0.1:8899/images/olori.png" alt="LA MAISON — Olori "  >
+        </a>
+        <nav class="nav" aria-label="Navigation principale">
+            <a href="http://127.0.0.1:8899" class="">Accueil</a>
+            <a href="http://127.0.0.1:8899/boutique" class="">Boutique</a>
+            <a href="http://127.0.0.1:8899/boutique?categorie=collection-ete">Collections</a>
+            <a href="http://127.0.0.1:8899/vue-360" class="active">Vue 360°</a>
+            <a href="http://127.0.0.1:8899/a-propos" class="">À propos</a>
+            <a href="http://127.0.0.1:8899/contact" class="">Contact</a>
+        </nav>
+        <div class="header-icons">
+            <a href="http://127.0.0.1:8899/boutique" aria-label="Rechercher"><span class="material-symbols-outlined">search</span></a>
+                            <a href="http://127.0.0.1:8899/login" aria-label="Connexion"><span class="material-symbols-outlined">person</span></a>
+                        <a class="cart-link" href="http://127.0.0.1:8899/panier" aria-label="Panier"><span class="material-symbols-outlined">shopping_bag</span></a>
+        </div>
+    </div>
+</header>
+
+
+<main>
+    <section class="section">
+    <div class="container">
+        <div class="section-head">
+            <div>
+                <span class="eyebrow">Immersion</span>
+                <h2>Vue 360°</h2>
+            </div>
+        </div>
+        <p class="v360-intro">Faites pivoter chaque pièce sous tous les angles, comme si vous la teniez entre les mains. Glissez sur l'image (ou utilisez la lecture automatique).</p>
+
+        <div class="v360-layout">
+            <div class="spin360" id="spin"
+                 data-path="http://127.0.0.1:8899/images/360"
+                 data-slug="robe-signature"
+                 data-frames="24">
+                <img class="spin360-img" src="http://127.0.0.1:8899/images/360/robe-signature/frame-01.svg" alt="Vue 360° de la pièce" draggable="false">
+                <div class="spin360-hint"><span class="material-symbols-outlined">360</span> Glissez pour faire pivoter</div>
+                <div class="spin360-controls">
+                    <button type="button" data-spin="prev" aria-label="Vue précédente"><span class="material-symbols-outlined">chevron_left</span></button>
+                    <button type="button" data-spin="play" aria-label="Lecture automatique"><span class="material-symbols-outlined">play_arrow</span></button>
+                    <button type="button" data-spin="next" aria-label="Vue suivante"><span class="material-symbols-outlined">chevron_right</span></button>
+                </div>
+            </div>
+
+            <aside class="v360-picker">
+                <h3>Choisir une pièce</h3>
+                                    <button type="button" class="v360-item active"
+                            data-slug="robe-signature" data-frames="24">
+                        <img src="http://127.0.0.1:8899/images/360/robe-signature/frame-01.svg" alt="Robe Signature">
+                        <span>Robe Signature</span>
+                    </button>
+                                    <button type="button" class="v360-item "
+                            data-slug="robe-ife" data-frames="24">
+                        <img src="http://127.0.0.1:8899/images/360/robe-ife/frame-01.svg" alt="Robe Ifè">
+                        <span>Robe Ifè</span>
+                    </button>
+                                <p class="v360-note">Démo avec images générées. Remplacez les fichiers de <code>public/images/360/&lt;produit&gt;/</code> par vos photos (<code>frame-01</code> … <code>frame-24</code>).</p>
+            </aside>
+        </div>
+    </div>
+</section>
+</main>
+
+<footer class="site-footer">
+    <div class="inner">
+        <div>
+            <img class="brand-logo footer-logo" src="http://127.0.0.1:8899/images/olori.JPEG" alt="LA MAISON — Olori">
+            <p>Maison de mode béninoise. Élégance, authenticité et savoir-faire, de Cotonou au monde entier.</p>
+        </div>
+        <div>
+            <h4>Boutique</h4>
+            <a href="http://127.0.0.1:8899/boutique?categorie=robes">Robes</a>
+            <a href="http://127.0.0.1:8899/boutique?categorie=accessoires">Accessoires</a>
+            <a href="http://127.0.0.1:8899/boutique?categorie=collection-ete">Collection été</a>
+        </div>
+        <div>
+            <h4>Aide</h4>
+            <a href="http://127.0.0.1:8899/contact">Contact & FAQ</a>
+            <a href="#">Livraison & retours</a>
+            <a href="#">Guide des tailles</a>
+        </div>
+        <div>
+            <h4>Suivez-nous</h4>
+            <a href="#">Instagram</a>
+            <a href="#">Facebook</a>
+            <a href="#">TikTok</a>
+        </div>
+    </div>
+    <div class="footer-bottom">© 2026 La Maison — Cotonou, Bénin · Paiement sécurisé KKiaPay · Mentions légales</div>
+</footer>
+
+<script src="http://127.0.0.1:8899/js/app.js"></script>
+</body>
+</html>

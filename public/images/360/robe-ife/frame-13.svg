@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 750" width="600" height="750">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F4F1E9"/>
+      <stop offset="1" stop-color="#E9E3D5"/>
+    </linearGradient>
+    <linearGradient id="gloss" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#ffffff" stop-opacity="0.40"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="shade" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#000000" stop-opacity="0.30"/>
+      <stop offset="0.16" stop-color="#000000" stop-opacity="0"/>
+      <stop offset="0.84" stop-color="#000000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000000" stop-opacity="0.30"/>
+    </linearGradient>
+    <clipPath id="body"><path d="M 270.0 150 C 270.0 150, 218.0 165, 218.0 178 C 218.0 250, 242.0 300, 242.0 330 L 172.0 560 Q 300 590, 428.0 560 L 358.0 330 C 358.0 300, 382.0 250, 382.0 178 C 382.0 165, 330.0 150, 330.0 150 Z"/></clipPath>
+  </defs>
+
+  <rect width="600" height="750" fill="url(#bg)"/>
+
+  <!-- ombre au sol -->
+  <ellipse cx="300" cy="576" rx="128" ry="20" fill="#000000" opacity="0.10"/>
+
+  <!-- corps de la robe -->
+  <g clip-path="url(#body)">
+    <rect x="150" y="140" width="300" height="440" fill="#9C4B5E"/>
+    <rect x="150" y="140" width="300" height="440" fill="url(#shade)"/>
+    <line x1="300" y1="150" x2="300" y2="565" stroke="#000000" stroke-opacity="0" stroke-width="6"/>
+    <rect x="150" y="140" width="300" height="440" fill="url(#gloss)"/>
+  </g>
+  <path d="M 270.0 150 C 270.0 150, 218.0 165, 218.0 178 C 218.0 250, 242.0 300, 242.0 330 L 172.0 560 Q 300 590, 428.0 560 L 358.0 330 C 358.0 300, 382.0 250, 382.0 178 C 382.0 165, 330.0 150, 330.0 150 Z" fill="none" stroke="#23201B" stroke-opacity="0.35" stroke-width="1.5"/>
+
+  <!-- badge d'angle -->
+  <g>
+    <rect x="252" y="628" width="96" height="30" rx="15" fill="#23201B"/>
+    <text x="300" y="648" text-anchor="middle" font-family="Jost, sans-serif" font-size="15" fill="#F4F1E9">180&#176;</text>
+  </g>
+
+  <!-- mini-boussole -->
+  <circle cx="300" cy="690" r="16" fill="none" stroke="#B0472B" stroke-opacity="0.5" stroke-width="1.5"/>
+  <circle cx="300" cy="702" r="5" fill="#B0472B"/>
+</svg>

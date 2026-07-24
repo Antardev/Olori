@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 750" width="600" height="750">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F4F1E9"/>
+      <stop offset="1" stop-color="#E9E3D5"/>
+    </linearGradient>
+    <linearGradient id="gloss" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0"/>
+      <stop offset="0.29" stop-color="#ffffff" stop-opacity="0.40"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="shade" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#000000" stop-opacity="0.30"/>
+      <stop offset="0.16" stop-color="#000000" stop-opacity="0"/>
+      <stop offset="0.84" stop-color="#000000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000000" stop-opacity="0.30"/>
+    </linearGradient>
+    <clipPath id="body"><path d="M 271.9 150 C 271.9 150, 223.3 165, 223.3 178 C 223.3 250, 245.7 300, 245.7 330 L 180.2 560 Q 300 590, 419.8 560 L 354.3 330 C 354.3 300, 376.7 250, 376.7 178 C 376.7 165, 328.1 150, 328.1 150 Z"/></clipPath>
+  </defs>
+
+  <rect width="600" height="750" fill="url(#bg)"/>
+
+  <!-- ombre au sol -->
+  <ellipse cx="300" cy="576" rx="119.76860080852" ry="20" fill="#000000" opacity="0.10"/>
+
+  <!-- corps de la robe -->
+  <g clip-path="url(#body)">
+    <rect x="150" y="140" width="300" height="440" fill="#B0472B"/>
+    <rect x="150" y="140" width="300" height="440" fill="url(#shade)"/>
+    <line x1="267.25077321642" y1="150" x2="267.25077321642" y2="565" stroke="#000000" stroke-opacity="0" stroke-width="6"/>
+    <rect x="150" y="140" width="300" height="440" fill="url(#gloss)"/>
+  </g>
+  <path d="M 271.9 150 C 271.9 150, 223.3 165, 223.3 178 C 223.3 250, 245.7 300, 245.7 330 L 180.2 560 Q 300 590, 419.8 560 L 354.3 330 C 354.3 300, 376.7 250, 376.7 178 C 376.7 165, 328.1 150, 328.1 150 Z" fill="none" stroke="#23201B" stroke-opacity="0.35" stroke-width="1.5"/>
+
+  <!-- badge d'angle -->
+  <g>
+    <rect x="252" y="628" width="96" height="30" rx="15" fill="#23201B"/>
+    <text x="300" y="648" text-anchor="middle" font-family="Jost, sans-serif" font-size="15" fill="#F4F1E9">210&#176;</text>
+  </g>
+
+  <!-- mini-boussole -->
+  <circle cx="300" cy="690" r="16" fill="none" stroke="#B0472B" stroke-opacity="0.5" stroke-width="1.5"/>
+  <circle cx="287" cy="700.39230484541" r="5" fill="#B0472B"/>
+</svg>
