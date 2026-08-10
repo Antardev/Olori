@@ -17,33 +17,51 @@ use App\Http\Controllers\Admin\AdminController;
 */
 
 // Vitrine et boutique
-Route::get('/', [ShopController::class, 'home'])->name('home');
-Route::get('/boutique', [ShopController::class, 'index'])->name('shop.index');
-Route::get('/produit/{slug}', [ShopController::class, 'show'])->name('shop.show');
+Route::controller(ShopController::class)->group(function () {
+    Route::get('/', 'home')->name('home');
+    Route::get('/boutique', 'index')->name('shop.index');
+    Route::get('/produit/{slug}', 'show')->name('shop.show');
+});
+
 
 // Pages
-Route::get('/a-propos', [PageController::class, 'about'])->name('about');
-Route::get('/contact', [PageController::class, 'contact'])->name('contact');
-Route::post('/contact', [PageController::class, 'send'])->name('contact.send');
-Route::get('/vue-360', [PageController::class, 'view360'])->name('view360');
+Route::controller(PageController::class)->group(function () {
+    Route::get('/mentions-legales', 'legal')->name('legal');
+    Route::get('/politique-confidentialite', 'privacy')->name('privacy');
+    Route::get('/conditions-generales-vente', 'terms')->name('terms');
+});
 
 // Panier et commande
-Route::get('/panier', [CartController::class, 'index'])->name('cart.index');
-Route::post('/panier/ajouter/{slug}', [CartController::class, 'add'])->name('cart.add');
-Route::post('/panier/retirer/{slug}', [CartController::class, 'remove'])->name('cart.remove');
-Route::get('/commande', [CheckoutController::class, 'index'])->name('checkout.index');
-Route::post('/commande', [CheckoutController::class, 'store'])->name('checkout.store');
-Route::get('/commande/confirmation', [CheckoutController::class, 'confirmation'])->name('checkout.confirmation');
+Route::controller(CartController::class)->group(function () {
+    Route::get('/panier', 'index')->name('cart.index');
+    Route::post('/panier/ajouter/{slug}', 'add')->name('cart.add');
+    Route::post('/panier/retirer/{slug}', 'remove')->name('cart.remove');
+});
+
+Route::controller(CheckoutController::class)->group(function () {
+    Route::get('/commande', 'index')->name('checkout.index');
+    Route::post('/commande', 'store')->name('checkout.store');
+    Route::get('/commande/confirmation', 'confirmation')->name('checkout.confirmation');
+});
+
 
 // Authentification — les routes login / register / logout / password.* sont
 // fournies automatiquement par Laravel Fortify (voir FortifyServiceProvider).
 
 // Back-office — accès réservé aux administrateurs authentifiés
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
-    Route::get('/', [AdminController::class, 'dashboard'])->name('dashboard');
-    Route::get('/articles', [AdminController::class, 'products'])->name('products');
-    Route::get('/articles/nouveau', [AdminController::class, 'productForm'])->name('products.create');
-    Route::get('/commandes', [AdminController::class, 'orders'])->name('orders');
-    Route::get('/promotions', [AdminController::class, 'promotions'])->name('promotions');
-    Route::get('/statistiques', [AdminController::class, 'stats'])->name('stats');
+    Route::controller(AdminController::class)->group(function () {
+        Route::get('/', 'dashboard')->name('dashboard');
+        Route::get('/articles', 'products')->name('products');
+        Route::get('/articles/nouveau', 'productForm')->name('products.create');
+        Route::get('/commandes', 'orders')->name('orders');
+        Route::get('/promotions', 'promotions')->name('promotions');
+        Route::get('/statistiques', 'stats')->name('stats');
+    });
+    // Route::get('/', [AdminController::class, 'dashboard'])->name('dashboard');
+    // Route::get('/articles', [AdminController::class, 'products'])->name('products');
+    // Route::get('/articles/nouveau', [AdminController::class, 'productForm'])->name('products.create');
+    // Route::get('/commandes', [AdminController::class, 'orders'])->name('orders');
+    // Route::get('/promotions', [AdminController::class, 'promotions'])->name('promotions');
+    // Route::get('/statistiques', [AdminController::class, 'stats'])->name('stats');
 });

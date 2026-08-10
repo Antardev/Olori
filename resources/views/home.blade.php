@@ -30,7 +30,7 @@
     <div class="inner">
         <div class="item"><span class="material-symbols-outlined">local_shipping</span><strong>Livraison Bénin & international</strong><span>Suivi de commande en temps réel</span></div>
         <div class="item"><span class="material-symbols-outlined">verified_user</span><strong>Paiement sécurisé</strong><span>KKiaPay — Mobile Money, carte bancaire</span></div>
-        <div class="item"><span class="material-symbols-outlined">payments</span><strong>Paiement à la livraison</strong><span>Disponible selon la zone de livraison</span></div>
+        {{-- <div class="item"><span class="material-symbols-outlined">payments</span><strong>Paiement à la livraison</strong><span>Disponible selon la zone de livraison</span></div> --}}
     </div>
 </section>
 

@@ -20,7 +20,7 @@
     <div class="inner">
         <button class="burger" aria-label="Ouvrir le menu" aria-expanded="false">☰</button>
         <a class="brand" href="{{ route('home') }}">
-            <img class="brand-logo" src="{{ asset('images/olori.png') }}" alt="LA MAISON — Olori "  >
+            <img class="brand-logo" src="{{ asset('images/nobackground.png') }}" alt="LA MAISON — Olori "  >
         </a>
         <nav class="nav" aria-label="Navigation principale">
             <a href="{{ route('home') }}" class="{{ request()->routeIs('home') ? 'active' : '' }}">Accueil</a>
@@ -56,7 +56,7 @@
 <footer class="site-footer">
     <div class="inner">
         <div>
-            <img class="brand-logo footer-logo" src="{{ asset('images/olori.JPEG') }}" alt="LA MAISON — Olori">
+            <img class="brand-logo footer-logo" src="{{ asset('images/nobackground.png') }}" alt="LA MAISON — Olori">
             <p>Maison de mode béninoise. Élégance, authenticité et savoir-faire, de Cotonou au monde entier.</p>
         </div>
         <div>

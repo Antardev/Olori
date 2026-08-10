@@ -227,13 +227,33 @@ h3 { font-size: 1.25rem; }
 .product-card:hover .ph::after { inset: 6px; opacity: .5; }
 
 /* Réassurance */
-.reassurance { background: var(--blanc); border-top: 1px solid var(--sable-fonce); border-bottom: 1px solid var(--sable-fonce); }
-.reassurance .inner {
-  max-width: var(--maxw); margin: 0 auto; padding: 34px 24px;
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; text-align: center;
+.reassurance {
+    background: var(--blanc);
+    border-top: 1px solid var(--sable-fonce);
+    border-bottom: 1px solid var(--sable-fonce);
 }
-.reassurance strong { display: block; font-size: 14px; letter-spacing: 1px; text-transform: uppercase; }
-.reassurance span { font-size: 14px; color: var(--encre-70); }
+
+.reassurance .inner {
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: 34px 24px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Changé de 3 à 2 */
+    gap: 24px;
+    text-align: center;
+}
+
+.reassurance strong {
+    display: block;
+    font-size: 14px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.reassurance span {
+    font-size: 14px;
+    color: var(--encre-70);
+}
 
 /* Bandeau éditorial */
 .editorial { background: var(--encre); color: var(--ivoire); text-align: center; }
