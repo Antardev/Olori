@@ -1,84 +1,111 @@
-# LA MAISON — Template e-commerce Laravel
+# LA MAISON — Application e‑commerce
 
-Template complet du site e-commerce (vitrine + boutique + espace client + back-office), issu de la maquette et conforme au cahier des charges : catalogue avec filtres, fiche produit (tailles, coloris, stock), panier, tunnel de commande avec paiement KKiaPay ou à la livraison, espace client, et interface d'administration (articles, commandes avec statuts, alertes de stock, promotions, statistiques).
+Projet "La Maison" : boutique en ligne complète (front, panier, tunnel de commande, espace client et back-office d'administration) développée avec Laravel. Ce dépôt contient l'application — ce n'est plus un simple template.
 
-Le template fonctionne immédiatement avec des **données de démonstration** (`app/Support/DemoData.php`), sans base de données. Il suffit ensuite de brancher vos modèles Eloquent.
+## Aperçu
 
-## Contenu
+- Stack : PHP 8.1+, Laravel 10/11, Vite pour les assets, Pest/PHPUnit pour les tests.
+- Fonctionnalités principales : catalogue avec filtres, fiche produit, panier, checkout, gestion des commandes et interface d'administration.
 
-```
-routes/web.php                      Toutes les routes du site et du back-office
-app/Http/Controllers/               ShopController, CartController, CheckoutController,
-                                    AccountController, PageController, Admin/AdminController
-app/Support/DemoData.php            Produits, commandes et statuts de démonstration
-resources/views/
-├── layouts/app.blade.php           Layout du site (en-tête, navigation, pied de page)
-├── layouts/admin.blade.php         Layout du back-office (barre latérale)
-├── home.blade.php                  Accueil : héros, réassurance, catégories, nouveautés
-├── shop/index.blade.php            Catalogue avec filtres (catégorie, prix, tri)
-├── shop/show.blade.php             Fiche produit : galerie, tailles, coloris, accordéons
-├── shop/_card.blade.php            Carte produit réutilisable
-├── cart/index.blade.php            Panier + récapitulatif + code promo
-├── checkout/index.blade.php        Adresse, zone de livraison, paiement KKiaPay
-├── checkout/confirmation.blade.php Confirmation de commande
-├── account/login.blade.php         Connexion / création de compte
-├── account/dashboard.blade.php     Commandes, favoris, adresses
-├── pages/about.blade.php           À propos (histoire, valeurs, savoir-faire)
-├── pages/contact.blade.php         Formulaire de contact + FAQ
-└── admin/                          Tableau de bord, articles, commandes,
-                                    promotions, statistiques
-public/css/app.css                  Styles du site (responsive, mobile-first)
-public/css/admin.css                Styles du back-office
-public/js/app.js                    Menu mobile, coloris, galerie
-```
+## Fonctionnalités
 
-## Installation
+- Catalogue produit avec filtres par catégorie, prix et tri.
+- Fiches produits détaillées : galerie d'images, déclinaisons (tailles, coloris), gestion du stock.
+- Panier avec résumé, gestion des quantités et codes promotionnels.
+- Tunnel de commande (checkout) : adresse, options de livraison, paiement (squelette Kkiapay + paiement à la livraison).
+- Espace client : inscription, connexion, tableau de bord, historique de commandes, adresses et favoris.
+- Back‑office : gestion des produits, commandes (statuts), promotions, alertes de stock et statistiques.
+- Données de développement : `app/Support/DemoData.php` pour travailler sans base de données complète.
+- Seeders et migrations fournis pour initialiser la base (`DatabaseSeeder`, `AdminUserSeeder`).
+- Authentification prête à l'emploi via Fortify (fichiers et provider présents).
+- Assets modernes (Vite, CSS et JS), responsive et optimisés pour mobile.
+- Tests unitaires et fonctionnels avec Pest/PHPUnit.
+- Bonnes pratiques SEO de base et structure des templates Blade pour adaptation.
 
-1. Créer un projet Laravel (10 ou 11) si ce n'est pas déjà fait :
+## Prérequis
 
-   ```bash
-   composer create-project laravel/laravel lamaison
-   cd lamaison
-   ```
+- PHP >= 8.1
+- Composer
+- Node.js >= 16 et npm/yarn
+- Une base de données (MySQL, MariaDB, SQLite...)
 
-2. Copier le contenu de ce template **par-dessus** le projet :
+## Installation (locale)
 
-   ```bash
-   cp -r routes app resources public /chemin/vers/lamaison/
-   ```
+1. Cloner le dépôt :
 
-   (Le fichier `routes/web.php` remplace celui d'origine.)
-
-3. Lancer le serveur de développement :
-
-   ```bash
-   php artisan serve
-   ```
-
-4. Ouvrir :
-   - Site : http://localhost:8000
-   - Back-office : http://localhost:8000/admin
-
-## Passage en production — points à brancher
-
-- **Base de données** : remplacer `DemoData` par des modèles `Product`, `Category`, `Order`, `PromoCode` (migrations à créer). Les contrôleurs sont commentés aux endroits concernés.
-- **Authentification** : installer Laravel Breeze ou Fortify pour l'espace client, et protéger le groupe de routes `/admin` avec un middleware `auth` + rôle administrateur.
-- **Paiement KKiaPay** : le squelette d'intégration (widget JS + vérification serveur) est documenté en commentaire dans `resources/views/checkout/index.blade.php` et `CheckoutController.php`. Documentation officielle : https://docs.kkiapay.me
-- **Emails automatiques** : créer des Mailables (confirmation de commande, expédition) déclenchés dans `CheckoutController@store` et au changement de statut dans le back-office.
-- **Photos produits** : les visuels sont des placeholders CSS (`.ph`). Remplacer par de vraies images (`<img>` ou `background-image`) une fois les photos de la marque disponibles.
-- **SEO** : les balises `title` et `meta description` sont dynamiques par page ; ajouter un sitemap et les balises Open Graph au lancement.
-
-## Personnalisation rapide
-
-Toute l'identité visuelle est centralisée dans les variables CSS en tête de `public/css/app.css` :
-
-```css
-:root {
-  --ivoire: #F4F1E9;   /* fond de page */
-  --encre:  #23201B;   /* texte */
-  --terra:  #B0472B;   /* couleur d'accent */
-  ...
-}
+```bash
+git clone <url-du-dépôt>
+cd e-commerce
 ```
 
-Modifier ces valeurs (et les polices Google Fonts dans les layouts) suffit à adapter le template à l'identité définitive de la marque.
+2. Installer les dépendances PHP :
+
+```bash
+composer install
+cp .env.example .env
+php artisan key:generate
+```
+
+3. Configurer la base de données dans le fichier `.env`, puis lancer les migrations et (optionnel) les seeders :
+
+```bash
+php artisan migrate
+php artisan db:seed --class=DatabaseSeeder
+```
+
+Si vous souhaitez créer l'utilisateur administrateur fourni par le seeder :
+
+```bash
+php artisan db:seed --class=AdminUserSeeder
+```
+
+4. Installer et compiler les assets :
+
+```bash
+npm install
+npm run dev   # ou `npm run build` pour production
+```
+
+5. Lancer l'application :
+
+```bash
+php artisan serve
+# ou utiliser Sail / Docker si configuré
+```
+
+Ouvrir le site : http://localhost:8000 et le back-office : http://localhost:8000/admin
+
+## Configuration importante
+
+- Variables à renseigner dans `.env` : `DB_*`, `MAIL_*`, `APP_URL`, `KKIAPAY_*` (si utilisation de Kkiapay).
+- Le code contient `app/Support/DemoData.php` pour faciliter le développement sans base de données complète ; en production, utilisez les migrations et modèles Eloquent.
+
+## Tests
+
+Exécuter la suite de tests :
+
+```bash
+composer test # ou vendor/bin/pest
+```
+
+## Développement et contribution
+
+- Respecter les conventions PSR et le style du code existant.
+- Ouvrir une branche par fonctionnalité : `feature/xxx`.
+- Créer une MR/PR avec une description claire et les étapes pour tester.
+
+## Accès admin
+
+Le seeder `database/seeders/AdminUserSeeder.php` permet de créer un compte administrateur pour accéder à `/admin`. Lancer le seeder après les migrations pour générer l'utilisateur.
+
+## Déploiement
+
+- Compiler les assets (`npm run build`), exécuter les migrations, configurer la gestion des queues et des tâches planifiées (cron) et sécuriser les variables d'environnement.
+
+## Licence
+
+Voir le fichier `LICENSE` (si présent) ou demander à l'équipe juridique pour le type de licence à appliquer.
+
+## Contact
+
+Pour toute question technique, ouvrir une issue dans le dépôt ou contacter l'équipe de développement.
