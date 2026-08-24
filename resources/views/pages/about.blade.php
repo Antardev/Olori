@@ -24,7 +24,7 @@
         <h2 style="margin-bottom:20px">Élégance, authenticité, modernité</h2>
         <p style="margin-bottom:16px">Chaque collection est imaginée dans notre atelier de Cotonou. Nous travaillons avec des artisanes partenaires, sélectionnons des tissus de qualité — wax premium, coton grand teint, soies mélangées — et produisons en séries courtes pour garantir le soin apporté à chaque pièce.</p>
         <p style="margin-bottom:16px">Notre ambition : porter la création béninoise au-delà des frontières, sans jamais renoncer à ce qui fait son âme.</p>
-        <a class="btn btn-solid" href="{{ route('shop.index') }}" style="margin-top:12px">Découvrir les collections</a>
+        <a class="btn btn-solid" href="{{ route('home') }}#categories" style="margin-top:12px">Découvrir les collections</a>
     </div>
 </section>
 

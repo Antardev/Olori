@@ -24,14 +24,14 @@
         </a>
         <nav class="nav" aria-label="Navigation principale">
             <a href="{{ route('home') }}" class="{{ request()->routeIs('home') ? 'active' : '' }}">Accueil</a>
-            <a href="{{ route('shop.index') }}" class="{{ request()->routeIs('shop.*') ? 'active' : '' }}">Boutique</a>
-            <a href="{{ route('shop.index', ['categorie' => 'collection-ete']) }}">Collections</a>
+            @foreach(\App\Support\DemoData::categories() as $catSlug => $catLabel)
+                <a href="{{ route('shop.category', $catSlug) }}" class="{{ request()->routeIs('shop.category') && request()->route('categorie') === $catSlug ? 'active' : '' }}">{{ $catLabel }}</a>
+            @endforeach
             <a href="{{ route('view360') }}" class="{{ request()->routeIs('view360') ? 'active' : '' }}">Vue 360°</a>
             <a href="{{ route('about') }}" class="{{ request()->routeIs('about') ? 'active' : '' }}">À propos</a>
             <a href="{{ route('contact') }}" class="{{ request()->routeIs('contact') ? 'active' : '' }}">Contact</a>
         </nav>
         <div class="header-icons">
-            <a href="{{ route('shop.index') }}" aria-label="Rechercher"><span class="material-symbols-outlined">search</span></a>
             @auth
                 <form method="POST" action="{{ route('logout') }}" style="display:inline">
                     @csrf
@@ -60,10 +60,11 @@
             <p>Maison de mode béninoise. Élégance, authenticité et savoir-faire, de Cotonou au monde entier.</p>
         </div>
         <div>
-            <h4>Boutique</h4>
-            <a href="{{ route('shop.index', ['categorie' => 'robes']) }}">Robes</a>
-            <a href="{{ route('shop.index', ['categorie' => 'accessoires']) }}">Accessoires</a>
-            <a href="{{ route('shop.index', ['categorie' => 'collection-ete']) }}">Collection été</a>
+            <h4>Catégories</h4>
+            @foreach(\App\Support\DemoData::categories() as $catSlug => $catLabel)
+                <a href="{{ route('shop.category', $catSlug) }}">{{ $catLabel }}</a>
+            @endforeach
+            <a href="{{ route('view360') }}">Vue 360°</a>
         </div>
         <div>
             <h4>Aide</h4>

@@ -169,3 +169,37 @@ table.data td.muted { color: var(--muted); }
   .main { padding: 20px; }
   .kpis, .form-grid { grid-template-columns: 1fr 1fr; }
 }
+
+/* ---------- Formulaire article ---------- */
+.alert-success { background: #E7EFE5; color: var(--vert); border-color: #CFDECB; }
+.alert-error { background: #F7E2DD; color: var(--terra); border-color: #EBCCC5; }
+
+.field-error { font-size: 13px; color: var(--terra); }
+.field input:user-invalid, .field select:user-invalid { border-color: var(--terra); }
+
+.tone-picker { display: flex; gap: 10px; flex-wrap: wrap; }
+.tone-option {
+  display: inline-flex; align-items: center; gap: 8px; cursor: pointer;
+  border: 1px solid var(--line); background: #FCFBF9; padding: 8px 14px; font-size: 14px;
+}
+.tone-option::before { content: ""; width: 16px; height: 16px; border-radius: 50%; background: currentColor; }
+.tone-option input { position: absolute; opacity: 0; width: 0; height: 0; }
+.tone-option:has(input:checked) { border-color: var(--encre); box-shadow: inset 0 0 0 1px var(--encre); }
+.tone-option:has(input:focus-visible) { outline: 2px solid var(--terra); outline-offset: 2px; }
+.tone-option span { color: var(--encre); }
+.tone-terra { color: #B0472B; }
+.tone-rose  { color: #9C4B5E; }
+.tone-sable { color: #C8B79A; }
+.tone-vert  { color: #3E5C46; }
+
+label.upload { display: block; cursor: pointer; transition: border-color .2s, background .2s; }
+label.upload:hover { border-color: var(--terra); background: #FFF; }
+.upload-preview { display: block; max-height: 220px; margin: 0 auto 12px; border: 1px solid var(--line); }
+
+/* Statut d'un article dans la liste */
+.badge-draft { background: #EAE6DD; color: var(--muted); }
+
+/* Actions sur une ligne d'article */
+.row-actions { display: flex; gap: 8px; align-items: center; justify-content: flex-end; }
+.btn-danger { background: transparent; border-color: #E0BDB5; color: var(--terra); }
+.btn-danger:hover { background: var(--terra); border-color: var(--terra); color: #fff; }

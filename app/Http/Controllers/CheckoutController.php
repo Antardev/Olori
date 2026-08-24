@@ -11,7 +11,7 @@ class CheckoutController extends Controller
         [$items, $subtotal] = CartController::cart($request);
 
         if (empty($items)) {
-            return redirect()->route('shop.index');
+            return redirect()->route('home');
         }
 
         $shipping = 1500;

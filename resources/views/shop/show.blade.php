@@ -1,7 +1,14 @@
 @extends('layouts.app')
 
+@php
+    $sizes  = $product['sizes'] ?: ['Unique'];
+    $colors = $product['colors'] ?: [];
+@endphp
+
 @section('title', $product['name'].' — LA MAISON')
-@section('meta_description', mb_substr($product['description'], 0, 150))
+@section('meta_description', $product['description']
+    ? mb_substr($product['description'], 0, 150)
+    : $product['name'].' — '.$product->category_label.' chez LA MAISON, maison de mode béninoise.')
 
 @section('content')
 <section class="section">
@@ -9,19 +16,27 @@
         <div class="product-page">
 
             <div class="gallery">
-                <div class="ph ph-{{ $product['tone'] }} main-ph">{{ mb_substr($product['name'], mb_strpos($product['name'], ' ') + 1, 1) }}</div>
-                <div class="thumbs">
-                    <div class="ph ph-{{ $product['tone'] }}">1</div>
-                    <div class="ph ph-sable">2</div>
-                    <div class="ph ph-{{ $product['tone'] }}">3</div>
-                    <div class="ph ph-sable">4</div>
-                </div>
+                @if($product['image'])
+                    <img class="product-img main-img" src="{{ asset($product['image']) }}" alt="{{ $product['name'] }}">
+                @else
+                    <div class="ph ph-{{ $product['tone'] }} main-ph">{{ mb_substr($product['name'], mb_strpos($product['name'], ' ') + 1, 1) }}</div>
+                    <div class="thumbs">
+                        <div class="ph ph-{{ $product['tone'] }}">1</div>
+                        <div class="ph ph-sable">2</div>
+                        <div class="ph ph-{{ $product['tone'] }}">3</div>
+                        <div class="ph ph-sable">4</div>
+                    </div>
+                @endif
             </div>
 
             <div class="pp-info">
-                <span class="eyebrow">{{ \App\Support\DemoData::categories()[$product['category']] ?? '' }}</span>
+                <span class="eyebrow">{{ $product->category_label }}</span>
                 <h1>{{ $product['name'] }}</h1>
-                <p class="pp-rating">★ {{ number_format($product['rating'], 1, ',') }} · {{ $product['reviews'] }} avis clients</p>
+                @if($product['reviews'] > 0)
+                    <p class="pp-rating">★ {{ number_format($product['rating'], 1, ',') }} · {{ $product['reviews'] }} avis clients</p>
+                @else
+                    <p class="pp-rating">Nouveauté — soyez la première personne à donner votre avis</p>
+                @endif
                 <p class="pp-price">
                     {{ number_format($product['price'], 0, ',', ' ') }} FCFA
                     @if($product['old_price'])
@@ -41,18 +56,20 @@
 
                     <p class="opt-label">Taille</p>
                     <div class="sizes">
-                        @foreach($product['sizes'] as $i => $size)
+                        @foreach($sizes as $i => $size)
                             <label><input type="radio" name="size" value="{{ $size }}" @checked($i === 0)><span>{{ $size }}</span></label>
                         @endforeach
                     </div>
 
-                    <p class="opt-label">Coloris</p>
-                    <div class="swatches">
-                        @foreach($product['colors'] as $i => $color)
-                            <span class="swatch {{ $i === 0 ? 'selected' : '' }}" style="background: {{ $color }}" data-color="{{ $color }}" role="button" tabindex="0" aria-label="Coloris {{ $i + 1 }}"></span>
-                        @endforeach
-                        <input type="hidden" name="color" id="color-input" value="{{ $product['colors'][0] }}">
-                    </div>
+                    @if($colors)
+                        <p class="opt-label">Coloris</p>
+                        <div class="swatches">
+                            @foreach($colors as $i => $color)
+                                <span class="swatch {{ $i === 0 ? 'selected' : '' }}" style="background: {{ $color }}" data-color="{{ $color }}" role="button" tabindex="0" aria-label="Coloris {{ $i + 1 }}"></span>
+                            @endforeach
+                            <input type="hidden" name="color" id="color-input" value="{{ $colors[0] }}">
+                        </div>
+                    @endif
 
                     <div class="qty-row">
                         <input type="number" name="qty" value="1" min="1" max="{{ max($product['stock'], 1) }}" aria-label="Quantité">
@@ -63,7 +80,12 @@
                 <div class="accordion">
                     <details open>
                         <summary>Description & entretien</summary>
-                        <div class="body">{{ $product['description'] }} Lavage à la main recommandé, repassage doux sur l'envers.</div>
+                        <div class="body">
+                            @if($product['description'])
+                                <p>{{ $product['description'] }}</p>
+                            @endif
+                            <p>Lavage à la main recommandé, repassage doux sur l'envers.</p>
+                        </div>
                     </details>
                     <details>
                         <summary>Livraison & retours</summary>

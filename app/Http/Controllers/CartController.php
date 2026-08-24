@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Support\DemoData;
+use App\Models\Product;
 use Illuminate\Http\Request;
 
 class CartController extends Controller
@@ -39,9 +39,9 @@ class CartController extends Controller
         $subtotal = 0;
 
         foreach ($request->session()->get('cart', []) as $slug => $qty) {
-            if ($product = DemoData::find($slug)) {
-                $items[] = ['product' => $product, 'qty' => $qty, 'line' => $product['price'] * $qty];
-                $subtotal += $product['price'] * $qty;
+            if ($product = Product::published()->where('slug', $slug)->first()) {
+                $items[] = ['product' => $product, 'qty' => $qty, 'line' => $product->price * $qty];
+                $subtotal += $product->price * $qty;
             }
         }
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Product;
 use App\Support\DemoData;
 use Illuminate\Http\Request;
 
@@ -9,47 +10,55 @@ class ShopController extends Controller
 {
     public function home()
     {
-        $products = DemoData::products();
-
         return view('home', [
-            'nouveautes'  => array_slice(array_filter($products, fn ($p) => $p['badge'] === 'Nouveau'), 0, 4),
-            'selection'   => array_slice($products, 0, 4),
-            'categories'  => DemoData::categories(),
+            'nouveautes' => Product::published()->where('badge', 'Nouveau')->latest()->take(4)->get(),
+            'selection'  => Product::published()->latest()->take(4)->get(),
+            'categories' => DemoData::categories(),
         ]);
     }
 
-    public function index(Request $request)
+    /**
+     * Page dédiée à une catégorie (une vue par catégorie : /hommes, /femmes…).
+     * Les articles publiés depuis le back-office y apparaissent immédiatement,
+     * les plus récents en tête.
+     */
+    public function category(Request $request, string $categorie)
     {
-        $products = DemoData::products();
+        $categories = DemoData::categories();
+        abort_if(! isset($categories[$categorie]), 404);
 
-        if ($cat = $request->query('categorie')) {
-            $products = array_filter($products, fn ($p) => $p['category'] === $cat);
-        }
+        $query = Product::published()->category($categorie);
+
         if ($max = $request->query('prix_max')) {
-            $products = array_filter($products, fn ($p) => $p['price'] <= (int) $max);
-        }
-        if ($sort = $request->query('tri')) {
-            usort($products, fn ($a, $b) => $sort === 'prix_desc'
-                ? $b['price'] <=> $a['price']
-                : $a['price'] <=> $b['price']);
+            $query->where('price', '<=', (int) $max);
         }
 
-        return view('shop.index', [
-            'products'   => $products,
-            'categories' => DemoData::categories(),
-            'active'     => $cat,
+        match ($request->query('tri')) {
+            'prix_asc'  => $query->orderBy('price'),
+            'prix_desc' => $query->orderByDesc('price'),
+            default     => $query->latest(),
+        };
+
+        return view('shop.category', [
+            'products'   => $query->get(),
+            'categories' => $categories,
+            'active'     => $categorie,
+            'label'      => $categories[$categorie],
+            'meta'       => DemoData::categoryMeta($categorie),
         ]);
     }
 
     public function show(string $slug)
     {
-        $product = DemoData::find($slug);
+        $product = Product::published()->where('slug', $slug)->first();
         abort_if(! $product, 404);
 
-        $similaires = array_slice(
-            array_filter(DemoData::products(), fn ($p) => $p['category'] === $product['category'] && $p['slug'] !== $slug),
-            0, 3
-        );
+        $similaires = Product::published()
+            ->category($product->category)
+            ->where('id', '!=', $product->id)
+            ->latest()
+            ->take(3)
+            ->get();
 
         return view('shop.show', compact('product', 'similaires'));
     }

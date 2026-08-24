@@ -177,6 +177,11 @@ h3 { font-size: 1.25rem; }
   padding: 8px 16px; font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
 }
 
+/* ---------- Visuels produits ---------- */
+/* photo chargée depuis le back-office : mêmes proportions que le placeholder */
+.product-img { aspect-ratio: 4 / 5; width: 100%; object-fit: cover; display: block; }
+.gallery .main-img { aspect-ratio: 4 / 5; }
+
 /* ---------- Placeholders visuels produits ---------- */
 .ph {
   aspect-ratio: 4 / 5; display: flex; align-items: center; justify-content: center;
@@ -201,8 +206,20 @@ h3 { font-size: 1.25rem; }
 .link-more { font-size: 13px; letter-spacing: 2px; text-transform: uppercase; border-bottom: 1px solid var(--terra); padding-bottom: 2px; }
 
 /* Catégories */
-.cat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-.cat-card { position: relative; }
+.cat-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(220px, 1fr));
+  gap: 20px;
+  max-width: 760px;
+  margin: 0 auto;
+  justify-content: center;
+}
+.cat-card {
+  position: relative;
+  width: 100%;
+  max-width: 340px;
+  justify-self: center;
+}
 .cat-card .ph { aspect-ratio: 1 / 1; }
 .cat-card .label {
   position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%);
@@ -210,6 +227,10 @@ h3 { font-size: 1.25rem; }
   letter-spacing: 2px; text-transform: uppercase; white-space: nowrap;
 }
 .cat-card:hover .label { background: var(--encre); color: var(--ivoire); }
+
+@media (max-width: 640px) {
+  .cat-grid { grid-template-columns: 1fr; }
+}
 
 /* Produits */
 .product-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
@@ -261,7 +282,31 @@ h3 { font-size: 1.25rem; }
 .editorial h2 { font-style: italic; font-size: clamp(1.8rem, 4vw, 2.8rem); }
 .editorial p { color: var(--sable-fonce); margin: 16px 0 28px; }
 
-/* ---------- Boutique / catalogue ---------- */
+/* ---------- Page catégorie ---------- */
+.cat-hero { position: relative; background: var(--encre); overflow: hidden; min-height: 42vh; display: flex; align-items: center; }
+/* photos en portrait recadrées en bandeau : on remonte le cadrage sur le vêtement */
+.cat-hero-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 32%; display: block; z-index: 0; }
+.cat-hero-overlay {
+  position: absolute; inset: 0; z-index: 1;
+  background:
+    linear-gradient(90deg, rgba(20,18,15,.78) 0%, rgba(20,18,15,.46) 55%, rgba(20,18,15,.12) 100%),
+    linear-gradient(0deg, rgba(20,18,15,.5) 0%, rgba(20,18,15,0) 45%);
+}
+.cat-hero-content { position: relative; z-index: 2; padding: 64px 24px; }
+.cat-hero-content .eyebrow { display: inline-flex; align-items: center; gap: 12px; color: var(--terra-clair); }
+.cat-hero-content .eyebrow::before { content: ""; width: 34px; height: 1px; background: currentColor; opacity: .85; }
+.cat-hero-content h1 { margin-top: 14px; color: var(--ivoire); font-size: clamp(2.2rem, 5vw, 3.4rem); text-shadow: 0 2px 30px rgba(0,0,0,.28); }
+.cat-hero-content .lead { margin-top: 16px; max-width: 52ch; font-size: 17px; color: rgba(244,241,233,.9); }
+
+.cat-switch { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 34px; }
+.cat-switch a {
+  border: 1px solid var(--sable-fonce); padding: 9px 22px; font-size: 14px;
+  letter-spacing: 1.5px; text-transform: uppercase; color: var(--encre-70); background: var(--blanc);
+}
+.cat-switch a:hover { border-color: var(--encre); color: var(--encre); }
+.cat-switch a.active { background: var(--encre); border-color: var(--encre); color: var(--ivoire); }
+
+/* ---------- Catalogue ---------- */
 .shop-layout { display: grid; grid-template-columns: 230px 1fr; gap: 40px; }
 .filters h3 { font-size: 15px; letter-spacing: 2px; text-transform: uppercase; font-family: var(--font-body); font-weight: 500; margin-bottom: 12px; }
 .filters ul { margin-bottom: 28px; }
@@ -300,6 +345,7 @@ h3 { font-size: 1.25rem; }
 .accordion summary::after { content: "+"; }
 .accordion details[open] summary::after { content: "–"; }
 .accordion .body { padding: 0 0 16px; font-size: 15px; color: var(--encre-70); }
+.accordion .body p + p { margin-top: 10px; }
 
 /* ---------- Panier & commande ---------- */
 .cart-table { width: 100%; border-collapse: collapse; }
@@ -378,7 +424,7 @@ h3 { font-size: 1.25rem; }
 /* Cartes catégories — zoom + voile + libellé animé */
 .cat-card { overflow: hidden; }
 .cat-card .ph, .cat-card .cat-img { transition: transform .6s cubic-bezier(.16,.8,.3,1); }
-.cat-card .cat-img { aspect-ratio: 1 / 1; width: 100%; object-fit: cover; }
+.cat-card .cat-img { aspect-ratio: 1 / 1; width: 100%; object-fit: cover; object-position: center 32%; }
 .cat-card:hover .cat-img { transform: scale(1.06); }
 .cat-card::after {
   content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0;
@@ -455,6 +501,8 @@ h3 { font-size: 1.25rem; }
 @media (max-width: 900px) {
   .hero { min-height: 62vh; }
   .hero .inner { padding: 48px 24px; }
+  .cat-hero { min-height: 32vh; }
+  .cat-hero-content { padding: 44px 24px; }
   .product-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
   .cat-grid { grid-template-columns: 1fr; }
   .reassurance .inner { grid-template-columns: 1fr; gap: 28px; }

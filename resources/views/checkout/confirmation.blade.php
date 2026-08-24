@@ -13,7 +13,7 @@
             <p style="margin:16px 0 26px;color:#4E463C">
                 Mode de paiement : {{ $order['payment'] === 'kkiapay' ? 'KKiaPay (payé)' : 'Paiement à la livraison' }}
             </p>
-            <a class="btn btn-solid" href="{{ route('shop.index') }}">Continuer mes achats</a>
+            <a class="btn btn-solid" href="{{ route('home') }}#categories">Continuer mes achats</a>
         </div>
     </div>
 </section>

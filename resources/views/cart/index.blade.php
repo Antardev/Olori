@@ -53,7 +53,7 @@
             </div>
         @else
             <p>Votre panier est vide pour le moment.</p>
-            <p style="margin-top:18px"><a class="btn" href="{{ route('shop.index') }}">Découvrir la boutique</a></p>
+            <p style="margin-top:18px"><a class="btn" href="{{ route('home') }}#categories">Découvrir nos catégories</a></p>
         @endif
     </div>
 </section>

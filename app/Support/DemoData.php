@@ -4,8 +4,9 @@ namespace App\Support;
 
 /**
  * Données de démonstration.
- * À remplacer par des modèles Eloquent (Product, Order, Category…)
- * une fois la base de données en place.
+ * Les articles sont désormais en base (modèle Product) ; products() ne sert
+ * plus qu'à alimenter ProductSeeder. Commandes et catégories restent ici,
+ * à basculer en Eloquent (Order, Category) à leur tour.
  */
 class DemoData
 {
@@ -14,7 +15,7 @@ class DemoData
         return [
             [
                 'id' => 1, 'slug' => 'robe-ife', 'name' => 'Robe Ifè',
-                'category' => 'robes', 'price' => 28000, 'old_price' => null,
+                'category' => 'femmes', 'price' => 28000, 'old_price' => null,
                 'tone' => 'terra', 'badge' => 'Nouveau',
                 'sizes' => ['S', 'M', 'L', 'XL'], 'colors' => ['#B0472B', '#23201B', '#9C4B5E'],
                 'stock' => 12, 'rating' => 4.8, 'reviews' => 26,
@@ -22,7 +23,7 @@ class DemoData
             ],
             [
                 'id' => 2, 'slug' => 'ensemble-adjara', 'name' => 'Ensemble Adjara',
-                'category' => 'robes', 'price' => 35000, 'old_price' => 42000,
+                'category' => 'hommes', 'price' => 35000, 'old_price' => 42000,
                 'tone' => 'sable', 'badge' => 'Promo',
                 'sizes' => ['S', 'M', 'L'], 'colors' => ['#C8B79A', '#23201B'],
                 'stock' => 1, 'rating' => 4.9, 'reviews' => 18,
@@ -30,7 +31,7 @@ class DemoData
             ],
             [
                 'id' => 3, 'slug' => 'sac-kefa', 'name' => 'Sac Kéfa',
-                'category' => 'accessoires', 'price' => 18500, 'old_price' => null,
+                'category' => 'femmes', 'price' => 18500, 'old_price' => null,
                 'tone' => 'rose', 'badge' => null,
                 'sizes' => ['Unique'], 'colors' => ['#9C4B5E', '#23201B'],
                 'stock' => 2, 'rating' => 4.7, 'reviews' => 31,
@@ -38,7 +39,7 @@ class DemoData
             ],
             [
                 'id' => 4, 'slug' => 'boubou-seme', 'name' => 'Boubou Sèmè',
-                'category' => 'collection-ete', 'price' => 45000, 'old_price' => null,
+                'category' => 'hommes', 'price' => 45000, 'old_price' => null,
                 'tone' => 'vert', 'badge' => 'Édition limitée',
                 'sizes' => ['M', 'L', 'XL'], 'colors' => ['#3E5C46', '#23201B'],
                 'stock' => 6, 'rating' => 5.0, 'reviews' => 9,
@@ -46,7 +47,7 @@ class DemoData
             ],
             [
                 'id' => 5, 'slug' => 'jupe-ganvie', 'name' => 'Jupe Ganvié',
-                'category' => 'robes', 'price' => 22000, 'old_price' => null,
+                'category' => 'femmes', 'price' => 22000, 'old_price' => null,
                 'tone' => 'sable', 'badge' => null,
                 'sizes' => ['S', 'M', 'L', 'XL'], 'colors' => ['#C8B79A', '#B0472B'],
                 'stock' => 15, 'rating' => 4.6, 'reviews' => 12,
@@ -54,7 +55,7 @@ class DemoData
             ],
             [
                 'id' => 6, 'slug' => 'collier-akaba', 'name' => 'Collier Akaba',
-                'category' => 'accessoires', 'price' => 9500, 'old_price' => null,
+                'category' => 'femmes', 'price' => 9500, 'old_price' => null,
                 'tone' => 'terra', 'badge' => null,
                 'sizes' => ['Unique'], 'colors' => ['#B0472B'],
                 'stock' => 20, 'rating' => 4.8, 'reviews' => 22,
@@ -62,7 +63,7 @@ class DemoData
             ],
             [
                 'id' => 7, 'slug' => 'chemise-oueme', 'name' => 'Chemise Ouémé',
-                'category' => 'collection-ete', 'price' => 26000, 'old_price' => null,
+                'category' => 'hommes', 'price' => 26000, 'old_price' => null,
                 'tone' => 'vert', 'badge' => 'Nouveau',
                 'sizes' => ['S', 'M', 'L', 'XL'], 'colors' => ['#3E5C46', '#C8B79A'],
                 'stock' => 8, 'rating' => 4.5, 'reviews' => 7,
@@ -70,7 +71,7 @@ class DemoData
             ],
             [
                 'id' => 8, 'slug' => 'foulard-atacora', 'name' => 'Foulard Atacora',
-                'category' => 'accessoires', 'price' => 7000, 'old_price' => 9000,
+                'category' => 'femmes', 'price' => 7000, 'old_price' => 9000,
                 'tone' => 'rose', 'badge' => 'Promo',
                 'sizes' => ['Unique'], 'colors' => ['#9C4B5E', '#3E5C46'],
                 'stock' => 30, 'rating' => 4.9, 'reviews' => 40,
@@ -82,20 +83,28 @@ class DemoData
     public static function categories(): array
     {
         return [
-            'robes' => 'Robes',
-            'accessoires' => 'Accessoires',
-            'collection-ete' => 'Collection été',
+            'hommes' => 'Hommes',
+            'femmes' => 'Femmes',
         ];
     }
 
-    public static function find(string $slug): ?array
+    /**
+     * Visuel et texte d'introduction de la page dédiée à une catégorie.
+     */
+    public static function categoryMeta(string $slug): array
     {
-        foreach (self::products() as $p) {
-            if ($p['slug'] === $slug) {
-                return $p;
-            }
-        }
-        return null;
+        return [
+            'hommes' => [
+                'image' => 'images/categories/hommes/hommes.jpg',
+                'tone'  => 'terra',
+                'intro' => "Boubous brodés, chemises et ensembles taillés à Cotonou. Des pièces masculines qui allient coupe contemporaine et savoir-faire traditionnel.",
+            ],
+            'femmes' => [
+                'image' => 'images/categories/femmes/femmes.jpg',
+                'tone'  => 'rose',
+                'intro' => "Robes, jupes et accessoires confectionnés à la main. Une garde-robe pensée pour vous accompagner du quotidien aux grandes occasions.",
+            ],
+        ][$slug] ?? ['image' => null, 'tone' => 'sable', 'intro' => ''];
     }
 
     public static function orders(): array

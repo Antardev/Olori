@@ -1,30 +1,41 @@
 @extends('layouts.app')
 
-@section('title', 'Boutique — LA MAISON')
+@section('title', $label.' — LA MAISON')
+@section('meta_description', $meta['intro'] ?: 'Découvrez la sélection '.$label.' de LA MAISON.')
 
 @section('content')
+
+{{-- Bandeau de la catégorie --}}
+<section class="cat-hero">
+    @if($meta['image'])
+        <img class="cat-hero-bg" src="{{ asset($meta['image']) }}" alt="{{ $label }}" loading="lazy">
+    @else
+        <div class="cat-hero-bg ph ph-{{ $meta['tone'] }}"></div>
+    @endif
+    <div class="cat-hero-overlay"></div>
+    <div class="container cat-hero-content">
+        <span class="eyebrow">Catégorie</span>
+        <h1>{{ $label }}</h1>
+        @if($meta['intro'])
+            <p class="lead">{{ $meta['intro'] }}</p>
+        @endif
+    </div>
+</section>
+
 <section class="section">
     <div class="container">
-        <div class="section-head">
-            <div>
-                <span class="eyebrow">Boutique</span>
-                <h2>{{ $active ? ($categories[$active] ?? 'Catalogue') : 'Tout le catalogue' }}</h2>
-            </div>
-        </div>
+
+        {{-- Passage d'une catégorie à l'autre --}}
+        <nav class="cat-switch" aria-label="Catégories">
+            @foreach($categories as $slug => $name)
+                <a href="{{ route('shop.category', $slug) }}" class="{{ $active === $slug ? 'active' : '' }}">{{ $name }}</a>
+            @endforeach
+        </nav>
 
         <div class="shop-layout">
             <aside class="filters">
-                <h3>Catégories</h3>
-                <ul>
-                    <li><a href="{{ route('shop.index') }}" class="{{ ! $active ? 'active' : '' }}">Tout voir</a></li>
-                    @foreach($categories as $slug => $label)
-                        <li><a href="{{ route('shop.index', ['categorie' => $slug]) }}" class="{{ $active === $slug ? 'active' : '' }}">{{ $label }}</a></li>
-                    @endforeach
-                </ul>
-
                 <h3>Filtrer</h3>
-                <form method="GET" action="{{ route('shop.index') }}">
-                    @if($active)<input type="hidden" name="categorie" value="{{ $active }}">@endif
+                <form method="GET" action="{{ route('shop.category', $active) }}">
                     <div class="field" style="margin-bottom:14px">
                         <label for="prix_max">Prix maximum (FCFA)</label>
                         <input type="number" id="prix_max" name="prix_max" step="1000" min="0" value="{{ request('prix_max') }}" placeholder="30 000">
@@ -39,6 +50,10 @@
                     </div>
                     <button class="btn btn-sm btn-block" type="submit">Appliquer</button>
                 </form>
+
+                @if(request()->hasAny(['prix_max', 'tri']))
+                    <p style="margin-top:14px"><a href="{{ route('shop.category', $active) }}" style="text-decoration:underline">Réinitialiser les filtres</a></p>
+                @endif
             </aside>
 
             <div>
@@ -52,7 +67,7 @@
                         @endforeach
                     </div>
                 @else
-                    <p>Aucun article ne correspond à ces filtres. <a href="{{ route('shop.index') }}" style="text-decoration:underline">Réinitialiser la recherche</a></p>
+                    <p>Aucun article ne correspond à ces filtres. <a href="{{ route('shop.category', $active) }}" style="text-decoration:underline">Voir toute la catégorie {{ $label }}</a></p>
                 @endif
             </div>
         </div>
