@@ -59,6 +59,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::get('/articles', 'products')->name('products');
         Route::get('/articles/nouveau', 'productForm')->name('products.create');
         Route::post('/articles', 'storeProduct')->name('products.store');
+        Route::get('/categories', 'categories')->name('categories');
+        Route::post('/categories', 'storeCategory')->name('categories.store');
+        Route::put('/categories/{category}', 'updateCategory')->name('categories.update');
+        Route::delete('/categories/{category}', 'destroyCategory')->name('categories.destroy');
         Route::delete('/articles/{product}', 'destroyProduct')->name('products.destroy');
         Route::get('/commandes', 'orders')->name('orders');
         Route::get('/promotions', 'promotions')->name('promotions');

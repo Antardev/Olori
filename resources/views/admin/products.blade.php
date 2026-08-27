@@ -12,18 +12,18 @@
             @endforeach
         </p>
     </div>
-    <a class="btn" href="{{ route('admin.products.create') }}">+ Nouvel article</a>
+    <a class="btn btn-primary" href="{{ route('admin.products.create') }}"><i class="bi bi-plus-lg" aria-hidden="true"></i> Nouvel article</a>
 </div>
 
 <div class="card">
     @if(count($products))
-        <table class="data">
-            <thead><tr><th>Article</th><th>Catégorie</th><th>Prix</th><th>Stock</th><th>Statut</th><th></th></tr></thead>
+        <table class="data table table-hover align-middle">
+            <thead><tr><th>Article</th><th>Collection / catégorie</th><th>Prix</th><th>Stock</th><th>Statut</th><th></th></tr></thead>
             <tbody>
                 @foreach($products as $p)
                     <tr>
                         <td><strong>{{ $p->name }}</strong></td>
-                        <td>{{ $p->category_label }}</td>
+                        <td>{{ $p->category_label }} / {{ $p->subcategory_label }}</td>
                         <td>{{ number_format($p->price, 0, ',', ' ') }} FCFA</td>
                         <td><span class="stock-pill {{ $p->stock <= 2 ? 'low' : '' }}">{{ $p->stock }} {{ $p->stock <= 2 ? '⚠' : '' }}</span></td>
                         <td>

@@ -73,7 +73,7 @@
 
                     <div class="qty-row">
                         <input type="number" name="qty" value="1" min="1" max="{{ max($product['stock'], 1) }}" aria-label="Quantité">
-                        <button class="btn btn-terra" type="submit" style="flex:1" @disabled($product['stock'] === 0)>Ajouter au panier</button>
+                        <button class="btn btn-terra" type="submit" @disabled($product['stock'] === 0)>Ajouter au panier</button>
                     </div>
                 </form>
 
@@ -100,13 +100,13 @@
         </div>
 
         @if(count($similaires))
-            <div class="section-head" style="margin-top:72px">
+            <div class="section-head suggestions">
                 <div>
                     <span class="eyebrow">Vous aimerez aussi</span>
                     <h2>Produits similaires</h2>
                 </div>
             </div>
-            <div class="product-grid" style="grid-template-columns:repeat(3,1fr)">
+            <div class="product-grid trois">
                 @foreach($similaires as $p)
                     @include('shop._card', ['p' => $p])
                 @endforeach

@@ -7,24 +7,25 @@
     <meta name="robots" content="noindex">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
+    @vite(['resources/css/admin.css', 'resources/js/admin.js'])
 </head>
 <body>
-<div class="admin">
+<div class="admin container-fluid px-0">
     <aside class="sidebar">
         <a class="brand" href="{{ route('admin.dashboard') }}">
-            <img class="brand-logo" src="{{ asset('images/olori.png') }}" alt="LA MAISON — Olori">
+            <img class="brand-logo" src="{{ asset('images/ooo-removebg-preview.png') }}" alt="OLÒRI — Made in Benin">
         </a>
         <span class="section-label">Boutique</span>
-        <a class="item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}">Tableau de bord</a>
-        <a class="item {{ request()->routeIs('admin.products*') ? 'active' : '' }}" href="{{ route('admin.products') }}">Articles</a>
-        <a class="item {{ request()->routeIs('admin.orders') ? 'active' : '' }}" href="{{ route('admin.orders') }}">Commandes</a>
-        <a class="item {{ request()->routeIs('admin.promotions') ? 'active' : '' }}" href="{{ route('admin.promotions') }}">Promotions</a>
-        <a class="item {{ request()->routeIs('admin.stats') ? 'active' : '' }}" href="{{ route('admin.stats') }}">Statistiques</a>
+        <a class="item d-flex align-items-center gap-2 {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}"><i class="bi bi-grid-1x2" aria-hidden="true"></i> Tableau de bord</a>
+        <a class="item d-flex align-items-center gap-2 {{ request()->routeIs('admin.products*') ? 'active' : '' }}" href="{{ route('admin.products') }}"><i class="bi bi-box-seam" aria-hidden="true"></i> Articles</a>
+        <a class="item d-flex align-items-center gap-2 {{ request()->routeIs('admin.categories*') ? 'active' : '' }}" href="{{ route('admin.categories') }}"><i class="bi bi-tags" aria-hidden="true"></i> Catégories</a>
+        <a class="item d-flex align-items-center gap-2 {{ request()->routeIs('admin.orders') ? 'active' : '' }}" href="{{ route('admin.orders') }}"><i class="bi bi-receipt" aria-hidden="true"></i> Commandes</a>
+        <a class="item d-flex align-items-center gap-2 {{ request()->routeIs('admin.promotions') ? 'active' : '' }}" href="{{ route('admin.promotions') }}"><i class="bi bi-percent" aria-hidden="true"></i> Promotions</a>
+        <a class="item d-flex align-items-center gap-2 {{ request()->routeIs('admin.stats') ? 'active' : '' }}" href="{{ route('admin.stats') }}"><i class="bi bi-bar-chart" aria-hidden="true"></i> Statistiques</a>
         <span class="section-label">Site</span>
-        <a class="item" href="{{ route('home') }}">Voir la boutique</a>
+        <a class="item d-flex align-items-center gap-2" href="{{ route('home') }}"><i class="bi bi-shop" aria-hidden="true"></i> Voir la boutique</a>
         <form method="POST" action="{{ route('logout') }}">
             @csrf
             <button type="submit" class="item item-logout">Déconnexion</button>
@@ -33,7 +34,7 @@
             <div class="sidebar-user">Connecté : {{ auth()->user()->name }}</div>
         @endauth
     </aside>
-    <main class="main">
+    <main class="main container-fluid">
         @if(session('status'))
             <div class="alert alert-success" role="status">{{ session('status') }}</div>
         @endif

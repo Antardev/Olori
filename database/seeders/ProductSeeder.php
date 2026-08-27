@@ -20,6 +20,7 @@ class ProductSeeder extends Seeder
                 [
                     'name'         => $p['name'],
                     'category'     => $p['category'],
+                    'subcategory'  => $p['subcategory'],
                     'price'        => $p['price'],
                     'old_price'    => $p['old_price'],
                     'tone'         => $p['tone'],

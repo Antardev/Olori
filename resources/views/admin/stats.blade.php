@@ -23,7 +23,7 @@
 
 <div class="card">
     <h2>Produits les plus vendus</h2>
-    <table class="data">
+    <table class="data table table-hover align-middle">
         <thead><tr><th>#</th><th>Article</th><th>Prix</th><th>Note</th><th>Avis</th></tr></thead>
         <tbody>
             @foreach($top as $i => $p)

@@ -15,7 +15,7 @@ class DemoData
         return [
             [
                 'id' => 1, 'slug' => 'robe-ife', 'name' => 'Robe Ifè',
-                'category' => 'femmes', 'price' => 28000, 'old_price' => null,
+                'category' => 'femmes', 'subcategory' => 'robes', 'price' => 28000, 'old_price' => null,
                 'tone' => 'terra', 'badge' => 'Nouveau',
                 'sizes' => ['S', 'M', 'L', 'XL'], 'colors' => ['#B0472B', '#23201B', '#9C4B5E'],
                 'stock' => 12, 'rating' => 4.8, 'reviews' => 26,
@@ -23,7 +23,7 @@ class DemoData
             ],
             [
                 'id' => 2, 'slug' => 'ensemble-adjara', 'name' => 'Ensemble Adjara',
-                'category' => 'hommes', 'price' => 35000, 'old_price' => 42000,
+                'category' => 'hommes', 'subcategory' => 'ensembles', 'price' => 35000, 'old_price' => 42000,
                 'tone' => 'sable', 'badge' => 'Promo',
                 'sizes' => ['S', 'M', 'L'], 'colors' => ['#C8B79A', '#23201B'],
                 'stock' => 1, 'rating' => 4.9, 'reviews' => 18,
@@ -31,7 +31,7 @@ class DemoData
             ],
             [
                 'id' => 3, 'slug' => 'sac-kefa', 'name' => 'Sac Kéfa',
-                'category' => 'femmes', 'price' => 18500, 'old_price' => null,
+                'category' => 'femmes', 'subcategory' => 'accessoires', 'price' => 18500, 'old_price' => null,
                 'tone' => 'rose', 'badge' => null,
                 'sizes' => ['Unique'], 'colors' => ['#9C4B5E', '#23201B'],
                 'stock' => 2, 'rating' => 4.7, 'reviews' => 31,
@@ -39,7 +39,7 @@ class DemoData
             ],
             [
                 'id' => 4, 'slug' => 'boubou-seme', 'name' => 'Boubou Sèmè',
-                'category' => 'hommes', 'price' => 45000, 'old_price' => null,
+                'category' => 'hommes', 'subcategory' => 'boubous', 'price' => 45000, 'old_price' => null,
                 'tone' => 'vert', 'badge' => 'Édition limitée',
                 'sizes' => ['M', 'L', 'XL'], 'colors' => ['#3E5C46', '#23201B'],
                 'stock' => 6, 'rating' => 5.0, 'reviews' => 9,
@@ -47,7 +47,7 @@ class DemoData
             ],
             [
                 'id' => 5, 'slug' => 'jupe-ganvie', 'name' => 'Jupe Ganvié',
-                'category' => 'femmes', 'price' => 22000, 'old_price' => null,
+                'category' => 'femmes', 'subcategory' => 'jupes', 'price' => 22000, 'old_price' => null,
                 'tone' => 'sable', 'badge' => null,
                 'sizes' => ['S', 'M', 'L', 'XL'], 'colors' => ['#C8B79A', '#B0472B'],
                 'stock' => 15, 'rating' => 4.6, 'reviews' => 12,
@@ -55,7 +55,7 @@ class DemoData
             ],
             [
                 'id' => 6, 'slug' => 'collier-akaba', 'name' => 'Collier Akaba',
-                'category' => 'femmes', 'price' => 9500, 'old_price' => null,
+                'category' => 'femmes', 'subcategory' => 'accessoires', 'price' => 9500, 'old_price' => null,
                 'tone' => 'terra', 'badge' => null,
                 'sizes' => ['Unique'], 'colors' => ['#B0472B'],
                 'stock' => 20, 'rating' => 4.8, 'reviews' => 22,
@@ -63,7 +63,7 @@ class DemoData
             ],
             [
                 'id' => 7, 'slug' => 'chemise-oueme', 'name' => 'Chemise Ouémé',
-                'category' => 'hommes', 'price' => 26000, 'old_price' => null,
+                'category' => 'hommes', 'subcategory' => 'chemises', 'price' => 26000, 'old_price' => null,
                 'tone' => 'vert', 'badge' => 'Nouveau',
                 'sizes' => ['S', 'M', 'L', 'XL'], 'colors' => ['#3E5C46', '#C8B79A'],
                 'stock' => 8, 'rating' => 4.5, 'reviews' => 7,
@@ -71,7 +71,7 @@ class DemoData
             ],
             [
                 'id' => 8, 'slug' => 'foulard-atacora', 'name' => 'Foulard Atacora',
-                'category' => 'femmes', 'price' => 7000, 'old_price' => 9000,
+                'category' => 'femmes', 'subcategory' => 'accessoires', 'price' => 7000, 'old_price' => 9000,
                 'tone' => 'rose', 'badge' => 'Promo',
                 'sizes' => ['Unique'], 'colors' => ['#9C4B5E', '#3E5C46'],
                 'stock' => 30, 'rating' => 4.9, 'reviews' => 40,
@@ -85,6 +85,22 @@ class DemoData
         return [
             'hommes' => 'Hommes',
             'femmes' => 'Femmes',
+        ];
+    }
+
+    public static function subcategories(): array
+    {
+        return [
+            'hommes' => [
+                'ensembles' => 'Ensembles',
+                'boubous'   => 'Boubous',
+                'chemises'  => 'Chemises',
+            ],
+            'femmes' => [
+                'robes'       => 'Robes',
+                'jupes'       => 'Jupes',
+                'accessoires' => 'Accessoires',
+            ],
         ];
     }
 

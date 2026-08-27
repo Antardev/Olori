@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreProductRequest;
+use App\Http\Requests\StoreCategoryRequest;
+use App\Models\Category;
 use App\Models\Product;
 use App\Support\DemoData;
 use Illuminate\Http\Request;
@@ -32,9 +34,67 @@ class AdminController extends Controller
     {
         return view('admin.product-form', [
             'categories' => DemoData::categories(),
+            'subcategories' => Category::query()->orderBy('sort_order')->orderBy('name')->get()->groupBy('collection')->map(fn ($items) => $items->pluck('name', 'slug'))->all(),
             'tones'      => Product::TONES,
             'badges'     => Product::BADGES,
         ]);
+    }
+
+    public function categories()
+    {
+        return view('admin.categories', [
+            'collections' => DemoData::categories(),
+            'categories'  => Category::query()->orderBy('collection')->orderBy('sort_order')->orderBy('name')->get()->groupBy('collection'),
+        ]);
+    }
+
+    public function storeCategory(StoreCategoryRequest $request)
+    {
+        $data = $request->validated();
+        $slug = Category::makeSlug($data['name']);
+
+        if (! $slug || Category::where('collection', $data['collection'])->where('slug', $slug)->exists()) {
+            return back()->withInput()->withErrors(['name' => 'Cette catégorie existe déjà dans cette collection.']);
+        }
+
+        Category::create([
+            'collection' => $data['collection'],
+            'slug'       => $slug,
+            'name'       => $data['name'],
+            'sort_order' => Category::where('collection', $data['collection'])->max('sort_order') + 1,
+        ]);
+
+        return redirect()->route('admin.categories')->with('status', 'La catégorie a été ajoutée à la collection.');
+    }
+
+    public function updateCategory(StoreCategoryRequest $request, Category $category)
+    {
+        $data = $request->validated();
+        $slug = Category::makeSlug($data['name']);
+
+        if (! $slug || Category::where('collection', $data['collection'])
+            ->where('slug', $slug)->where('id', '!=', $category->id)->exists()) {
+            return back()->withInput()->withErrors(['name' => 'Cette catégorie existe déjà dans cette collection.']);
+        }
+
+        $category->update([
+            'collection' => $data['collection'],
+            'slug'       => $slug,
+            'name'       => $data['name'],
+        ]);
+
+        return redirect()->route('admin.categories')->with('status', 'La catégorie a été modifiée.');
+    }
+
+    public function destroyCategory(Category $category)
+    {
+        if (Product::where('subcategory', $category->slug)->where('category', $category->collection)->exists()) {
+            return back()->withErrors(['category' => 'Cette catégorie ne peut pas être supprimée car elle contient des articles.']);
+        }
+
+        $category->delete();
+
+        return redirect()->route('admin.categories')->with('status', 'La catégorie a été supprimée.');
     }
 
     /**
@@ -49,6 +109,7 @@ class AdminController extends Controller
             'slug'         => Product::uniqueSlug($data['name']),
             'name'         => $data['name'],
             'category'     => $data['category'],
+            'subcategory'  => $data['subcategory'],
             'price'        => $data['price'],
             'old_price'    => $data['old_price'] ?? null,
             'tone'         => $data['tone'],

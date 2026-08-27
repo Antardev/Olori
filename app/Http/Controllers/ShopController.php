@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\Category;
 use App\Support\DemoData;
 use Illuminate\Http\Request;
 
@@ -28,6 +29,12 @@ class ShopController extends Controller
         abort_if(! isset($categories[$categorie]), 404);
 
         $query = Product::published()->category($categorie);
+        $subcategories = Category::forCollection($categorie)->pluck('name', 'slug')->all();
+        $subcategory = $request->query('sous_categorie');
+
+        if ($subcategory && isset($subcategories[$subcategory])) {
+            $query->where('subcategory', $subcategory);
+        }
 
         if ($max = $request->query('prix_max')) {
             $query->where('price', '<=', (int) $max);
@@ -44,7 +51,9 @@ class ShopController extends Controller
             'categories' => $categories,
             'active'     => $categorie,
             'label'      => $categories[$categorie],
-            'meta'       => DemoData::categoryMeta($categorie),
+            'meta'          => DemoData::categoryMeta($categorie),
+            'subcategories' => $subcategories,
+            'subcategory'  => $subcategory,
         ]);
     }
 

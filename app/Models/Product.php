@@ -21,7 +21,7 @@ class Product extends Model
     public const BADGES = ['Nouveau', 'Promo', 'Édition limitée'];
 
     protected $fillable = [
-        'slug', 'name', 'category', 'price', 'old_price', 'tone', 'badge',
+        'slug', 'name', 'category', 'subcategory', 'price', 'old_price', 'tone', 'badge',
         'sizes', 'colors', 'stock', 'rating', 'reviews', 'description',
         'image', 'is_published',
     ];
@@ -56,6 +56,13 @@ class Product extends Model
     public function getCategoryLabelAttribute(): string
     {
         return DemoData::categories()[$this->category] ?? $this->category;
+    }
+
+    public function getSubcategoryLabelAttribute(): string
+    {
+        return Category::where('collection', $this->category)
+            ->where('slug', $this->subcategory)
+            ->value('name') ?? $this->subcategory ?? 'Non classée';
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Models\Product;
+use App\Models\Category;
 use App\Support\DemoData;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -20,6 +21,7 @@ class StoreProductRequest extends FormRequest
         return [
             'name'        => ['required', 'string', 'max:120'],
             'category'    => ['required', Rule::in(array_keys(DemoData::categories()))],
+            'subcategory' => ['required', Rule::in(Category::where('collection', $this->input('category'))->pluck('slug')->all())],
             'price'       => ['required', 'integer', 'min:0'],
             'old_price'   => ['nullable', 'integer', 'gt:price'],
             'stock'       => ['required', 'integer', 'min:0'],
@@ -36,7 +38,8 @@ class StoreProductRequest extends FormRequest
     {
         return [
             'name'        => "nom de l'article",
-            'category'    => 'catégorie',
+            'category'    => 'collection',
+            'subcategory' => 'catégorie',
             'price'       => 'prix',
             'old_price'   => 'prix barré',
             'stock'       => 'stock',
