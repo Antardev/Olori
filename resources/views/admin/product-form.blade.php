@@ -22,7 +22,7 @@
     <div class="form-grid">
         <div class="field">
             <label for="name">Nom de l'article</label>
-            <input class="form-control" id="name" name="name" value="{{ old('name') }}" placeholder="Chemise Ouémé" required>
+            <input class="form-control" id="name" name="name" value="{{ old('name') }}" required>
             @error('name')<span class="field-error">{{ $message }}</span>@enderror
         </div>
 
@@ -48,13 +48,13 @@
 
         <div class="field">
             <label for="price">Prix (FCFA)</label>
-            <input class="form-control" id="price" name="price" type="number" step="500" min="0" value="{{ old('price') }}" placeholder="28000" required>
+            <input class="form-control" id="price" name="price" type="number" step="500" min="0" value="{{ old('price') }}" required>
             @error('price')<span class="field-error">{{ $message }}</span>@enderror
         </div>
 
         <div class="field">
             <label for="old_price">Prix barré (facultatif)</label>
-            <input class="form-control" id="old_price" name="old_price" type="number" step="500" min="0" value="{{ old('old_price') }}" placeholder="42000">
+            <input class="form-control" id="old_price" name="old_price" type="number" step="500" min="0" value="{{ old('old_price') }}" >
             @error('old_price')<span class="field-error">{{ $message }}</span>@enderror
         </div>
 
@@ -75,29 +75,16 @@
             @error('badge')<span class="field-error">{{ $message }}</span>@enderror
         </div>
 
-        <div class="field">
+        <div class="field" id="sizes-field">
             <label for="sizes">Tailles (séparées par des virgules)</label>
             <input class="form-control" id="sizes" name="sizes" value="{{ old('sizes') }}" placeholder="S, M, L, XL">
             @error('sizes')<span class="field-error">{{ $message }}</span>@enderror
         </div>
 
         <div class="field">
-            <label for="colors">Coloris (codes hexadécimaux, séparés par des virgules)</label>
-            <input class="form-control" id="colors" name="colors" value="{{ old('colors') }}" placeholder="#B0472B, #23201B">
+            <label for="colors">Coloris (noms séparés par des virgules)</label>
+            <input class="form-control" id="colors" name="colors" value="{{ old('colors') }}" placeholder="Rouge brique, Noir, Beige">
             @error('colors')<span class="field-error">{{ $message }}</span>@enderror
-        </div>
-
-        <div class="field full">
-            <label for="tone">Teinte d'affichage — utilisée tant qu'aucune photo n'est chargée</label>
-            <div class="tone-picker">
-                @foreach($tones as $value => $name)
-                    <label class="tone-option tone-{{ $value }}">
-                        <input type="radio" name="tone" value="{{ $value }}" @checked(old('tone', 'sable') === $value)>
-                        <span>{{ $name }}</span>
-                    </label>
-                @endforeach
-            </div>
-            @error('tone')<span class="field-error">{{ $message }}</span>@enderror
         </div>
 
         <div class="field full">
@@ -107,11 +94,11 @@
         </div>
 
         <div class="field full">
-            <label for="photo">Photo</label>
+            <label for="photo">Photos de l'article</label>
             <label class="upload" for="photo">
                 <img class="upload-preview" alt="" hidden>
-                <span class="upload-text">Cliquez pour choisir une photo — JPG, PNG ou WebP, 4 Mo maximum</span>
-                <input id="photo" name="photo" type="file" accept="image/jpeg,image/png,image/webp" hidden>
+                <span class="upload-text">Choisissez jusqu'à 5 photos. La première sera la photo principale — JPG, PNG ou WebP, 4 Mo maximum par photo</span>
+                <input id="photo" name="photo[]" type="file" accept="image/jpeg,image/png,image/webp" multiple hidden>
             </label>
             @error('photo')<span class="field-error">{{ $message }}</span>@enderror
         </div>
@@ -136,22 +123,30 @@ function fillSubcategories(selected = null) {
     });
 }
 
+function toggleSizes() {
+    const isAccessory = collectionSelect.value === 'accessoires';
+    document.getElementById('sizes-field').hidden = isAccessory;
+    if (isAccessory) document.getElementById('sizes').value = '';
+}
+
 collectionSelect.addEventListener('change', function () {
     fillSubcategories();
+    toggleSizes();
 });
 
 fillSubcategories(selectedSubcategory);
+toggleSizes();
 
 document.getElementById('photo').addEventListener('change', function (e) {
-    const file = e.target.files[0];
+    const files = [...e.target.files];
     const zone = e.target.closest('.upload');
     const preview = zone.querySelector('.upload-preview');
     const text = zone.querySelector('.upload-text');
 
-    if (!file) return;
-    preview.src = URL.createObjectURL(file);
+    if (!files.length) return;
+    preview.src = URL.createObjectURL(files[0]);
     preview.hidden = false;
-    text.textContent = file.name + ' — cliquez pour changer';
+    text.textContent = files.length + ' photo' + (files.length > 1 ? 's sélectionnées' : ' sélectionnée') + ' — cliquez pour changer';
 });
 </script>
 @endsection

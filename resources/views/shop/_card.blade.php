@@ -5,7 +5,7 @@
     @if($p['image'])
         <img class="product-img" src="{{ asset($p['image']) }}" alt="{{ $p['name'] }}" loading="lazy">
     @else
-        <div class="ph ph-{{ $p['tone'] }}">{{ mb_substr($p['name'], mb_strpos($p['name'], ' ') + 1, 1) }}</div>
+        <div class="ph ph-sable">{{ mb_substr($p['name'], mb_strpos($p['name'], ' ') + 1, 1) }}</div>
     @endif
     <div class="info">
         <div class="name">{{ $p['name'] }}</div>

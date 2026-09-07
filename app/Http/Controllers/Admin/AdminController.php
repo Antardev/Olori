@@ -6,9 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\StoreCategoryRequest;
 use App\Models\Category;
+use App\Models\Order;
 use App\Models\Product;
+use App\Models\Promotion;
+use App\Http\Requests\StorePromotionRequest;
 use App\Support\DemoData;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class AdminController extends Controller
 {
@@ -34,8 +38,7 @@ class AdminController extends Controller
     {
         return view('admin.product-form', [
             'categories' => DemoData::categories(),
-            'subcategories' => Category::query()->orderBy('sort_order')->orderBy('name')->get()->groupBy('collection')->map(fn ($items) => $items->pluck('name', 'slug'))->all(),
-            'tones'      => Product::TONES,
+            'subcategories' => DemoData::subcategories(),
             'badges'     => Product::BADGES,
         ]);
     }
@@ -112,9 +115,8 @@ class AdminController extends Controller
             'subcategory'  => $data['subcategory'],
             'price'        => $data['price'],
             'old_price'    => $data['old_price'] ?? null,
-            'tone'         => $data['tone'],
             'badge'        => $data['badge'] ?? null,
-            'sizes'        => $request->list('sizes') ?: ['Unique'],
+            'sizes'        => $data['category'] === 'accessoires' ? [] : ($request->list('sizes') ?: ['Unique']),
             'colors'       => $request->list('colors'),
             'stock'        => $data['stock'],
             'description'  => $data['description'] ?? null,
@@ -124,7 +126,12 @@ class AdminController extends Controller
         // La photo n'est déplacée qu'une fois l'article en base : un échec
         // d'enregistrement ne laisse donc pas de fichier orphelin sur le disque.
         if ($request->hasFile('photo')) {
-            $product->update(['image' => $this->storePhoto($request, $product->slug)]);
+            $photos = $request->file('photo');
+            $paths = array_map(fn ($photo) => $this->storePhoto($photo, $product->slug), $photos);
+            $product->update([
+                'image'  => $paths[0],
+                'images' => array_slice($paths, 1),
+            ]);
         }
 
         $message = $product->is_published
@@ -147,6 +154,12 @@ class AdminController extends Controller
             unlink(public_path($product->image));
         }
 
+        foreach ($product->images ?? [] as $image) {
+            if (file_exists(public_path($image))) {
+                unlink(public_path($image));
+            }
+        }
+
         $product->delete();
 
         return redirect()->route('admin.products')
@@ -154,23 +167,64 @@ class AdminController extends Controller
     }
 
     /** Enregistre la photo dans public/images/produits et renvoie son chemin. */
-    private function storePhoto(Request $request, string $slug): string
+    private function storePhoto($file, string $slug): string
     {
-        $file = $request->file('photo');
-        $name = $slug.'-'.now()->format('YmdHis').'.'.$file->getClientOriginalExtension();
-        $file->move(public_path('images/produits'), $name);
+        $directory = public_path('images/produits');
+
+        if (! is_dir($directory)) {
+            mkdir($directory, 0755, true);
+        }
+
+        $name = $slug.'-'.now()->format('YmdHis').'-'.bin2hex(random_bytes(4)).'.'.$file->getClientOriginalExtension();
+        $file->move($directory, $name);
 
         return 'images/produits/'.$name;
     }
 
     public function orders()
     {
-        return view('admin.orders', ['orders' => DemoData::orders(), 'statuses' => DemoData::statuses()]);
+        return view('admin.orders', ['orders' => Order::latest()->get(), 'statuses' => Order::STATUSES]);
+    }
+
+    public function orderShow(Order $order)
+    {
+        return view('admin.order-show', ['order' => $order, 'statuses' => Order::STATUSES]);
+    }
+
+    public function updateOrderStatus(Request $request, Order $order)
+    {
+        $data = $request->validate([
+            'status' => ['required', 'string', Rule::in(array_keys(Order::STATUSES))],
+        ]);
+
+        $order->update(['status' => $data['status']]);
+
+        return back()->with('status', "Le statut de la commande {$order->ref} a été mis à jour.");
     }
 
     public function promotions()
     {
-        return view('admin.promotions');
+        return view('admin.promotions', ['promotions' => Promotion::latest()->get()]);
+    }
+
+    public function storePromotion(StorePromotionRequest $request)
+    {
+        Promotion::create([
+            ...$request->validated(),
+            'is_active' => $request->boolean('is_active', true),
+        ]);
+
+        return redirect()->route('admin.promotions')->with('status', 'Le code promotionnel a été créé.');
+    }
+
+    public function updatePromotion(StorePromotionRequest $request, Promotion $promotion)
+    {
+        $promotion->update([
+            ...$request->validated(),
+            'is_active' => $request->boolean('is_active'),
+        ]);
+
+        return redirect()->route('admin.promotions')->with('status', 'Le code promotionnel a été modifié.');
     }
 
     public function stats()
@@ -185,3 +239,4 @@ class AdminController extends Controller
         ]);
     }
 }
+

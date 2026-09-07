@@ -22,7 +22,7 @@
                         <tbody>
                             @foreach($items as $item)
                                 <tr>
-                                    <td class="cart-thumb"><div class="ph ph-{{ $item['product']['tone'] }}">{{ mb_substr($item['product']['name'], 0, 1) }}</div></td>
+                                    <td class="cart-thumb"><div class="ph ph-sable">{{ mb_substr($item['product']['name'], 0, 1) }}</div></td>
                                     <td><a href="{{ route('shop.show', $item['product']['slug']) }}">{{ $item['product']['name'] }}</a></td>
                                     <td>{{ number_format($item['product']['price'], 0, ',', ' ') }} FCFA</td>
                                     <td>{{ $item['qty'] }}</td>
@@ -41,13 +41,26 @@
 
                 <aside class="summary">
                     <h3 style="margin-bottom:14px">Récapitulatif</h3>
+                    <form method="POST" action="{{ route('cart.promotion.apply') }}" style="margin-bottom:18px">
+                        @csrf
+                        <label for="promo_code">Code promo</label>
+                        <div style="display:flex;gap:8px;margin-top:6px">
+                            <input class="form-control" id="promo_code" name="promo_code" value="{{ session('promo_code') }}" placeholder="BIENVENUE">
+                            <button class="btn btn-sm" type="submit">Appliquer</button>
+                        </div>
+                        @error('promo_code')<span class="field-error">{{ $message }}</span>@enderror
+                    </form>
                     <div class="row"><span>Sous-total</span><span>{{ number_format($subtotal, 0, ',', ' ') }} FCFA</span></div>
+                    @if($discount)
+                        <div class="row"><span>Remise ({{ $promotion->code }})</span><span>-{{ number_format($discount, 0, ',', ' ') }} FCFA</span></div>
+                        <form method="POST" action="{{ route('cart.promotion.remove') }}" style="margin:8px 0 14px">
+                            @csrf
+                            @method('DELETE')
+                            <button class="btn btn-sm btn-ghost" type="submit">Retirer le code promo</button>
+                        </form>
+                    @endif
                     <div class="row"><span>Livraison (Cotonou)</span><span>{{ number_format($shipping, 0, ',', ' ') }} FCFA</span></div>
-                    <div class="row total"><span>Total</span><span>{{ number_format($subtotal + $shipping, 0, ',', ' ') }} FCFA</span></div>
-                    <div class="field" style="margin:18px 0">
-                        <label for="promo">Code promo</label>
-                        <input type="text" id="promo" placeholder="ETE2026">
-                    </div>
+                    <div class="row total"><span>Total</span><span>{{ number_format($subtotal - $discount + $shipping, 0, ',', ' ') }} FCFA</span></div>
                     <a class="btn btn-terra btn-block" href="{{ route('checkout.index') }}">Passer la commande</a>
                 </aside>
             </div>

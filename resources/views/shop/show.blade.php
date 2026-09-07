@@ -3,6 +3,7 @@
 @php
     $sizes  = $product['sizes'] ?: ['Unique'];
     $colors = $product['colors'] ?: [];
+    $gallery = array_values(array_filter(array_merge([$product['image']], $product['images'] ?? [])));
 @endphp
 
 @section('title', $product['name'].' — LA MAISON')
@@ -16,14 +17,23 @@
         <div class="product-page">
 
             <div class="gallery">
-                @if($product['image'])
-                    <img class="product-img main-img" src="{{ asset($product['image']) }}" alt="{{ $product['name'] }}">
+                @if($gallery)
+                    <img class="product-img main-img" src="{{ asset($gallery[0]) }}" alt="{{ $product['name'] }}">
+                    @if(count($gallery) > 1)
+                        <div class="thumbs">
+                            @foreach($gallery as $index => $image)
+                                <button class="thumb {{ $index === 0 ? 'active' : '' }}" type="button" data-image="{{ asset($image) }}" aria-label="Voir la photo {{ $index + 1 }}">
+                                    <img src="{{ asset($image) }}" alt="" loading="lazy">
+                                </button>
+                            @endforeach
+                        </div>
+                    @endif
                 @else
-                    <div class="ph ph-{{ $product['tone'] }} main-ph">{{ mb_substr($product['name'], mb_strpos($product['name'], ' ') + 1, 1) }}</div>
+                    <div class="ph ph-sable main-ph">{{ mb_substr($product['name'], mb_strpos($product['name'], ' ') + 1, 1) }}</div>
                     <div class="thumbs">
-                        <div class="ph ph-{{ $product['tone'] }}">1</div>
+                        <div class="ph ph-sable">1</div>
                         <div class="ph ph-sable">2</div>
-                        <div class="ph ph-{{ $product['tone'] }}">3</div>
+                        <div class="ph ph-sable">3</div>
                         <div class="ph ph-sable">4</div>
                     </div>
                 @endif
@@ -63,11 +73,13 @@
 
                     @if($colors)
                         <p class="opt-label">Coloris</p>
-                        <div class="swatches">
+                        <div class="sizes color-options">
                             @foreach($colors as $i => $color)
-                                <span class="swatch {{ $i === 0 ? 'selected' : '' }}" style="background: {{ $color }}" data-color="{{ $color }}" role="button" tabindex="0" aria-label="Coloris {{ $i + 1 }}"></span>
+                                <label>
+                                    <input type="radio" name="color" value="{{ $color }}" @checked($i === 0)>
+                                    <span>{{ $color }}</span>
+                                </label>
                             @endforeach
-                            <input type="hidden" name="color" id="color-input" value="{{ $colors[0] }}">
                         </div>
                     @endif
 
@@ -114,4 +126,14 @@
         @endif
     </div>
 </section>
+<script>
+document.querySelectorAll('.thumb').forEach(function (thumb) {
+    thumb.addEventListener('click', function () {
+        const gallery = thumb.closest('.gallery');
+        gallery.querySelector('.main-img').src = thumb.dataset.image;
+        gallery.querySelectorAll('.thumb').forEach(item => item.classList.remove('active'));
+        thumb.classList.add('active');
+    });
+});
+</script>
 @endsection

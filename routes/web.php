@@ -20,6 +20,7 @@ use App\Support\DemoData;
 // Vitrine et fiches produit
 Route::controller(ShopController::class)->group(function () {
     Route::get('/', 'home')->name('home');
+    Route::get('/accessoires', 'accessories')->name('shop.accessories');
     Route::get('/produit/{slug}', 'show')->name('shop.show');
 });
 
@@ -29,6 +30,8 @@ Route::controller(PageController::class)->group(function () {
     Route::get('/a-propos', 'about')->name('about');
     Route::get('/contact', 'contact')->name('contact');
     Route::post('/contact', 'send')->name('contact.send');
+    Route::get('/livraison-retours', 'shipping')->name('shipping');
+    Route::get('/guide-tailles', 'sizeGuide')->name('size-guide');
     Route::get('/vue-360', 'view360')->name('view360');
     Route::get('/mentions-legales', 'legal')->name('legal');
     Route::get('/politique-confidentialite', 'privacy')->name('privacy');
@@ -40,6 +43,8 @@ Route::controller(CartController::class)->group(function () {
     Route::get('/panier', 'index')->name('cart.index');
     Route::post('/panier/ajouter/{slug}', 'add')->name('cart.add');
     Route::post('/panier/retirer/{slug}', 'remove')->name('cart.remove');
+    Route::post('/panier/promotion', 'applyPromotion')->name('cart.promotion.apply');
+    Route::delete('/panier/promotion', 'removePromotion')->name('cart.promotion.remove');
 });
 
 Route::controller(CheckoutController::class)->group(function () {
@@ -65,7 +70,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::delete('/categories/{category}', 'destroyCategory')->name('categories.destroy');
         Route::delete('/articles/{product}', 'destroyProduct')->name('products.destroy');
         Route::get('/commandes', 'orders')->name('orders');
+        Route::patch('/commandes/{order}/statut', 'updateOrderStatus')->name('orders.status');
+        Route::get('/commandes/{order}', 'orderShow')->name('orders.show');
         Route::get('/promotions', 'promotions')->name('promotions');
+        Route::post('/promotions', 'storePromotion')->name('promotions.store');
+        Route::put('/promotions/{promotion}', 'updatePromotion')->name('promotions.update');
         Route::get('/statistiques', 'stats')->name('stats');
     });
 });

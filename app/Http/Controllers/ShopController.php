@@ -57,6 +57,29 @@ class ShopController extends Controller
         ]);
     }
 
+    public function accessories(Request $request)
+    {
+        $gender = $request->query('genre');
+        $products = Product::published()->where(function ($query) {
+            $query->where('category', 'accessoires')
+                ->orWhere('subcategory', 'accessoires');
+        });
+
+        if (in_array($gender, ['hommes', 'femmes', 'mixtes'], true)) {
+            $products->where(function ($query) use ($gender) {
+                $query->where('subcategory', $gender)
+                    ->orWhere(function ($legacyQuery) use ($gender) {
+                        $legacyQuery->where('category', $gender)->where('subcategory', 'accessoires');
+                    });
+            });
+        }
+
+        return view('shop.accessories', [
+            'products' => $products->latest()->get(),
+            'gender' => $gender,
+        ]);
+    }
+
     public function show(string $slug)
     {
         $product = Product::published()->where('slug', $slug)->first();

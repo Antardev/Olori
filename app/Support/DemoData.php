@@ -83,8 +83,9 @@ class DemoData
     public static function categories(): array
     {
         return [
-            'hommes' => 'Hommes',
-            'femmes' => 'Femmes',
+            'hommes'      => 'Hommes',
+            'femmes'      => 'Femmes',
+            'accessoires' => 'Accessoires',
         ];
     }
 
@@ -100,6 +101,11 @@ class DemoData
                 'robes'       => 'Robes',
                 'jupes'       => 'Jupes',
                 'accessoires' => 'Accessoires',
+            ],
+            'accessoires' => [
+                'hommes' => 'Hommes',
+                'femmes' => 'Femmes',
+                'mixtes' => 'Mixtes',
             ],
         ];
     }
@@ -119,6 +125,11 @@ class DemoData
                 'image' => 'images/categories/femmes/femmes.jpg',
                 'tone'  => 'rose',
                 'intro' => "Robes, jupes et accessoires confectionnés à la main. Une garde-robe pensée pour vous accompagner du quotidien aux grandes occasions.",
+            ],
+            'accessoires' => [
+                'image' => 'images/Accesoires/Accessoires.jpg',
+                'tone'  => 'sable',
+                'intro' => 'Des pièces artisanales pour compléter chaque silhouette, pour hommes, femmes et styles mixtes.',
             ],
         ][$slug] ?? ['image' => null, 'tone' => 'sable', 'intro' => ''];
     }

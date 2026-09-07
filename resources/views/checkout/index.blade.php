@@ -22,14 +22,6 @@
                     <div class="field full"><label for="email">Email</label><input id="email" name="email" type="email" required placeholder="nom@exemple.com"></div>
                     <div class="field full"><label for="address">Adresse</label><input id="address" name="address" required placeholder="Quartier, rue, repère"></div>
                     <div class="field"><label for="city">Ville</label><input id="city" name="city" value="Cotonou" required></div>
-                    <div class="field">
-                        <label for="zone">Zone de livraison</label>
-                        <select id="zone" name="zone">
-                            <option value="cotonou">Cotonou — 1 500 FCFA</option>
-                            <option value="benin">Reste du Bénin — 3 000 FCFA</option>
-                            <option value="international">International — sur devis</option>
-                        </select>
-                    </div>
                 </div>
 
                 <h3 style="margin:32px 0 4px">Paiement</h3>
@@ -38,13 +30,9 @@
                         <input type="radio" name="payment" value="kkiapay" checked>
                         <span><strong>KKiaPay</strong><small>Mobile Money (MTN, Moov) et carte bancaire — paiement sécurisé.</small></span>
                     </label>
-                    <label>
-                        <input type="radio" name="payment" value="livraison">
-                        <span><strong>Paiement à la livraison</strong><small>Disponible à Cotonou uniquement.</small></span>
-                    </label>
                 </div>
 
-                <button class="btn btn-terra" type="submit">Payer {{ number_format($subtotal + $shipping, 0, ',', ' ') }} FCFA</button>
+                <button class="btn btn-terra" type="submit">Payer {{ number_format($subtotal - $discount + $shipping, 0, ',', ' ') }} FCFA</button>
             </div>
 
             <aside class="summary">
@@ -53,7 +41,10 @@
                     <div class="row"><span>{{ $item['product']['name'] }} × {{ $item['qty'] }}</span><span>{{ number_format($item['line'], 0, ',', ' ') }} FCFA</span></div>
                 @endforeach
                 <div class="row"><span>Livraison</span><span>{{ number_format($shipping, 0, ',', ' ') }} FCFA</span></div>
-                <div class="row total"><span>Total</span><span>{{ number_format($subtotal + $shipping, 0, ',', ' ') }} FCFA</span></div>
+                @if($discount)
+                    <div class="row"><span>Remise{{ $promotion ? ' ('.$promotion->code.')' : '' }}</span><span>-{{ number_format($discount, 0, ',', ' ') }} FCFA</span></div>
+                @endif
+                <div class="row total"><span>Total</span><span>{{ number_format($subtotal - $discount + $shipping, 0, ',', ' ') }} FCFA</span></div>
             </aside>
         </form>
     </div>

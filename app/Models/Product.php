@@ -9,21 +9,13 @@ use Illuminate\Support\Str;
 
 class Product extends Model
 {
-    /** Teintes du placeholder visuel, alignées sur la charte (.ph-* en CSS). */
-    public const TONES = [
-        'terra' => 'Terracotta',
-        'rose'  => 'Rose',
-        'sable' => 'Sable',
-        'vert'  => 'Vert',
-    ];
-
     /** Pastilles affichables sur la fiche produit. */
     public const BADGES = ['Nouveau', 'Promo', 'Édition limitée'];
 
     protected $fillable = [
-        'slug', 'name', 'category', 'subcategory', 'price', 'old_price', 'tone', 'badge',
+        'slug', 'name', 'category', 'subcategory', 'price', 'old_price', 'badge',
         'sizes', 'colors', 'stock', 'rating', 'reviews', 'description',
-        'image', 'is_published',
+        'image', 'images', 'is_published',
     ];
 
     protected function casts(): array
@@ -31,6 +23,7 @@ class Product extends Model
         return [
             'sizes'        => 'array',
             'colors'       => 'array',
+            'images'       => 'array',
             'price'        => 'integer',
             'old_price'    => 'integer',
             'stock'        => 'integer',

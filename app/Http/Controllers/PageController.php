@@ -16,6 +16,16 @@ class PageController extends Controller
         return view('pages.contact');
     }
 
+    public function shipping()
+    {
+        return view('pages.shipping');
+    }
+
+    public function sizeGuide()
+    {
+        return view('pages.size-guide');
+    }
+
     public function view360()
     {
         // Chaque séquence : slug, titre, dossier des frames, nombre de vues.

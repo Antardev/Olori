@@ -27,6 +27,7 @@
 
         {{-- Passage d'une collection à l'autre --}}
         <nav class="cat-switch" aria-label="Collections">
+            <h2>Choisir sa collection</h2>
             @foreach($categories as $slug => $name)
                 <a href="{{ route('shop.category', $slug) }}" class="{{ $active === $slug ? 'active' : '' }}">{{ $name }}</a>
             @endforeach

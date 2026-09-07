@@ -25,12 +25,12 @@ class StoreProductRequest extends FormRequest
             'price'       => ['required', 'integer', 'min:0'],
             'old_price'   => ['nullable', 'integer', 'gt:price'],
             'stock'       => ['required', 'integer', 'min:0'],
-            'tone'        => ['required', Rule::in(array_keys(Product::TONES))],
             'badge'       => ['nullable', Rule::in(Product::BADGES)],
-            'sizes'       => ['nullable', 'string', 'max:120'],
+            'sizes'       => [Rule::excludeIf($this->input('category') === 'accessoires'), 'nullable', 'string', 'max:120'],
             'colors'      => ['nullable', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:2000'],
-            'photo'       => ['nullable', 'image', 'mimes:jpeg,jpg,png,webp', 'max:4096'],
+            'photo'       => ['nullable', 'array', 'max:5'],
+            'photo.*'     => ['image', 'mimes:jpeg,jpg,png,webp', 'max:4096'],
         ];
     }
 
@@ -43,12 +43,11 @@ class StoreProductRequest extends FormRequest
             'price'       => 'prix',
             'old_price'   => 'prix barré',
             'stock'       => 'stock',
-            'tone'        => "teinte d'affichage",
             'badge'       => 'pastille',
             'sizes'       => 'tailles',
             'colors'      => 'coloris',
             'description' => 'description',
-            'photo'       => 'photo',
+            'photo'       => 'photos',
         ];
     }
 
@@ -62,9 +61,11 @@ class StoreProductRequest extends FormRequest
             'min.numeric' => 'Le champ « :attribute » ne peut pas être négatif.',
             'max.string'  => 'Le champ « :attribute » ne doit pas dépasser :max caractères.',
             'old_price.gt' => 'Le prix barré doit être supérieur au prix de vente.',
-            'photo.image' => 'Le fichier envoyé n\'est pas une image.',
-            'photo.mimes' => 'La photo doit être au format JPG, PNG ou WebP.',
-            'photo.max'   => 'La photo ne doit pas dépasser 4 Mo.',
+            'photo.array'   => 'Sélectionnez au maximum 5 photos.',
+            'photo.max'     => 'Sélectionnez au maximum 5 photos.',
+            'photo.*.image' => 'L\'un des fichiers envoyés n\'est pas une image.',
+            'photo.*.mimes' => 'Les photos doivent être au format JPG, PNG ou WebP.',
+            'photo.*.max'   => 'Chaque photo ne doit pas dépasser 4 Mo.',
         ];
     }
 

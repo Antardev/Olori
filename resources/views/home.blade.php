@@ -67,6 +67,7 @@
                     <span class="label">{{ $label }}</span>
                 </a>
             @endforeach
+          
         </div>
     </div>
 </section>

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Promotion;
 use App\Models\Product;
 use Illuminate\Http\Request;
 
@@ -11,8 +12,10 @@ class CartController extends Controller
     {
         [$items, $subtotal] = $this->cart($request);
         $shipping = $subtotal > 0 ? 1500 : 0; // Zone Cotonou par défaut
+        $promotion = $this->promotion($request);
+        $discount = $promotion ? (int) floor($subtotal * $promotion->discount_percent / 100) : 0;
 
-        return view('cart.index', compact('items', 'subtotal', 'shipping'));
+        return view('cart.index', compact('items', 'subtotal', 'shipping', 'promotion', 'discount'));
     }
 
     public function add(Request $request, string $slug)
@@ -31,6 +34,47 @@ class CartController extends Controller
         $request->session()->put('cart', $cart);
 
         return redirect()->route('cart.index')->with('status', 'Article retiré du panier');
+    }
+
+    public function applyPromotion(Request $request)
+    {
+        $data = $request->validate([
+            'promo_code' => ['required', 'string', 'max:40'],
+        ]);
+
+        $promotion = Promotion::activeByCode($data['promo_code']);
+
+        if (! $promotion) {
+            return back()->withInput()->withErrors(['promo_code' => 'Ce code promo est invalide ou expiré.']);
+        }
+
+        $request->session()->put('promo_code', $promotion->code);
+
+        return back()->with('status', 'Code promo appliqué.');
+    }
+
+    public function removePromotion(Request $request)
+    {
+        $request->session()->forget('promo_code');
+
+        return back()->with('status', 'Code promo retiré.');
+    }
+
+    public static function promotion(Request $request): ?Promotion
+    {
+        $code = $request->session()->get('promo_code');
+
+        if (! $code) {
+            return null;
+        }
+
+        $promotion = Promotion::activeByCode($code);
+
+        if (! $promotion) {
+            $request->session()->forget('promo_code');
+        }
+
+        return $promotion;
     }
 
     public static function cart(Request $request): array

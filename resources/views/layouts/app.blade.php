@@ -18,21 +18,30 @@
 
 <header class="site-header">
     <div class="inner">
-        <button class="burger" aria-label="Ouvrir le menu" aria-expanded="false">☰</button>
-        <a class="brand" href="{{ route('home') }}">
-            <img class="brand-logo" src="{{ asset('images/ooo-removebg-preview.png') }}" alt="LA MAISON — Olori "  >
-        </a>
-        <nav class="nav" aria-label="Navigation principale">
+        <button class="burger" type="button" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="mobile-menu">
+            <span class="material-symbols-outlined" aria-hidden="true">menu</span>
+        </button>
+        <nav class="nav nav-left" aria-label="Navigation principale">
             <a href="{{ route('home') }}" class="{{ request()->routeIs('home') ? 'active' : '' }}">Accueil</a>
+            {{-- <a href="{{ route('shop.accessories') }}" class="{{ request()->routeIs('shop.accessories') ? 'active' : '' }}">Accessoires</a> --}}
             <details class="nav-dropdown">
                 <summary>Collection</summary>
                 <div class="nav-dropdown-menu">
                     @foreach(\App\Support\DemoData::categories() as $catSlug => $catLabel)
                         <a href="{{ route('shop.category', $catSlug) }}" class="{{ request()->routeIs('shop.category') && request()->route('categorie') === $catSlug ? 'active' : '' }}">{{ $catLabel }}</a>
                     @endforeach
+
                 </div>
             </details>
-            <a href="{{ route('view360') }}" class="{{ request()->routeIs('view360') ? 'active' : '' }}">Vue 360°</a>
+     <a href="{{ route('view360') }}" class="{{ request()->routeIs('view360') ? 'active' : '' }}">Galerie</a>
+                <a class="mobile-nav-link {{ request()->routeIs('about') ? 'active' : '' }}" href="{{ route('about') }}">À propos</a>
+                <a class="mobile-nav-link {{ request()->routeIs('contact') ? 'active' : '' }}" href="{{ route('contact') }}">Contact</a>
+        </nav>
+        <a class="brand" href="{{ route('home') }}">
+            <img class="brand-logo" src="{{ asset('images/ooo-removebg-preview.png') }}" alt="LA MAISON — Olori">
+        </a>
+        <nav class="nav nav-right" aria-label="Navigation secondaire">
+
             <a href="{{ route('about') }}" class="{{ request()->routeIs('about') ? 'active' : '' }}">À propos</a>
             <a href="{{ route('contact') }}" class="{{ request()->routeIs('contact') ? 'active' : '' }}">Contact</a>
         </nav>
@@ -48,6 +57,29 @@
             <a class="cart-link" href="{{ route('cart.index') }}" aria-label="Panier"><span class="material-symbols-outlined">shopping_bag</span>@if(($n = count(session('cart', []))) > 0)<span class="cart-count">{{ $n }}</span>@endif</a>
         </div>
     </div>
+    <div class="mobile-menu-backdrop" data-mobile-menu-close></div>
+    <aside class="mobile-menu" id="mobile-menu" aria-hidden="true" aria-label="Menu mobile">
+        <div class="mobile-menu-head">
+            <span class="eyebrow">Navigation</span>
+            <button class="mobile-menu-close" type="button" aria-label="Fermer le menu" data-mobile-menu-close>
+                <span class="material-symbols-outlined" aria-hidden="true">close</span>
+            </button>
+        </div>
+        <nav class="mobile-menu-links" aria-label="Navigation mobile">
+            <a href="{{ route('home') }}" class="{{ request()->routeIs('home') ? 'active' : '' }}">Accueil</a>
+            <details>
+                <summary>Collection</summary>
+                <div>
+                    @foreach(\App\Support\DemoData::categories() as $catSlug => $catLabel)
+                        <a href="{{ route('shop.category', $catSlug) }}">{{ $catLabel }}</a>
+                    @endforeach
+                </div>
+            </details>
+            <a href="{{ route('view360') }}" class="{{ request()->routeIs('view360') ? 'active' : '' }}">Galerie</a>
+            <a href="{{ route('about') }}" class="{{ request()->routeIs('about') ? 'active' : '' }}">À propos</a>
+            <a href="{{ route('contact') }}" class="{{ request()->routeIs('contact') ? 'active' : '' }}">Contact</a>
+        </nav>
+    </aside>
 </header>
 
 @if(session('status'))
@@ -69,13 +101,13 @@
             @foreach(\App\Support\DemoData::categories() as $catSlug => $catLabel)
                 <a href="{{ route('shop.category', $catSlug) }}">{{ $catLabel }}</a>
             @endforeach
-            <a href="{{ route('view360') }}">Vue 360°</a>
+
         </div>
         <div>
             <h4>Aide</h4>
             <a href="{{ route('contact') }}">Contact & FAQ</a>
-            <a href="#">Livraison & retours</a>
-            <a href="#">Guide des tailles</a>
+            <a href="{{ route('shipping') }}">Livraison & retours</a>
+            <a href="{{ route('size-guide') }}">Guide des tailles</a>
         </div>
         <div>
             <h4>Suivez-nous</h4>

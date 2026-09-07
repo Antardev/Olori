@@ -22,11 +22,29 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Menu mobile
   var burger = document.querySelector('.burger');
-  var nav = document.querySelector('.nav');
-  if (burger && nav) {
+  var mobileMenu = document.querySelector('.mobile-menu');
+  var mobileMenuBackdrop = document.querySelector('.mobile-menu-backdrop');
+  var mobileMenuClose = document.querySelectorAll('[data-mobile-menu-close]');
+  if (burger && mobileMenu) {
+    function setMobileMenu(open) {
+      mobileMenu.classList.toggle('is-open', open);
+      if (mobileMenuBackdrop) mobileMenuBackdrop.classList.toggle('is-open', open);
+      mobileMenu.setAttribute('aria-hidden', String(!open));
+      burger.setAttribute('aria-expanded', String(open));
+      document.body.classList.toggle('menu-open', open);
+    }
+
     burger.addEventListener('click', function () {
-      nav.classList.toggle('open');
-      burger.setAttribute('aria-expanded', nav.classList.contains('open'));
+      setMobileMenu(!mobileMenu.classList.contains('is-open'));
+    });
+    mobileMenuClose.forEach(function (button) {
+      button.addEventListener('click', function () { setMobileMenu(false); });
+    });
+    mobileMenu.querySelectorAll('a').forEach(function (link) {
+      link.addEventListener('click', function () { setMobileMenu(false); });
+    });
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape') setMobileMenu(false);
     });
   }
 

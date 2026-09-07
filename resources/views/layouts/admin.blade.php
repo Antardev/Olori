@@ -13,7 +13,17 @@
 </head>
 <body>
 <div class="admin container-fluid px-0">
-    <aside class="sidebar">
+    <button class="admin-menu-toggle" type="button" aria-label="Ouvrir le menu d'administration" aria-expanded="false" aria-controls="admin-sidebar">
+        <span class="material-symbols-outlined" aria-hidden="true">menu</span>
+    </button>
+    <div class="admin-sidebar-backdrop" data-admin-menu-close></div>
+    <aside class="sidebar" id="admin-sidebar">
+        <div class="sidebar-mobile-head">
+            <span class="section-label">Menu</span>
+            <button class="sidebar-close" type="button" aria-label="Fermer le menu" data-admin-menu-close>
+                <span class="material-symbols-outlined" aria-hidden="true">close</span>
+            </button>
+        </div>
         <a class="brand" href="{{ route('admin.dashboard') }}">
             <img class="brand-logo" src="{{ asset('images/ooo-removebg-preview.png') }}" alt="OLÒRI — Made in Benin">
         </a>
