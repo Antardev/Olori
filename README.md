@@ -1,35 +1,59 @@
-# LA MAISON — Application e‑commerce
+# LA MAISON — Boutique e-commerce
 
-Projet "La Maison" : boutique en ligne complète (front, panier, tunnel de commande, espace client et back-office d'administration) développée avec Laravel. Ce dépôt contient l'application — ce n'est plus un simple template.
+Projet de boutique en ligne développé avec Laravel et Vite. La solution couvre la vitrine, le catalogue, le panier, le tunnel de commande, les avis clients et le back-office administratif.
 
-## Aperçu
+## Stack technique
 
-- Stack : PHP 8.1+, Laravel 10/11, Vite pour les assets, Pest/PHPUnit pour les tests.
-- Fonctionnalités principales : catalogue avec filtres, fiche produit, panier, checkout, gestion des commandes et interface d'administration.
+- PHP 8.3
+- Laravel 13
+- Laravel Fortify pour l'authentification
+- Vite + Tailwind CSS + Bootstrap
+- Pest pour les tests
+- SQLite/MySQL/MariaDB selon l'environnement
 
-## Fonctionnalités
+## Aperçu des fonctionnalités
 
-- Catalogue produit avec filtres par catégorie, prix et tri.
-- Fiches produits détaillées : galerie d'images, déclinaisons (tailles, coloris), gestion du stock.
-- Panier avec résumé, gestion des quantités et codes promotionnels.
-- Tunnel de commande (checkout) : adresse, options de livraison, paiement (squelette Kkiapay + paiement à la livraison).
-- Espace client : inscription, connexion, tableau de bord, historique de commandes, adresses et favoris.
-- Back‑office : gestion des produits, commandes (statuts), promotions, alertes de stock et statistiques.
-- Données de développement : `app/Support/DemoData.php` pour travailler sans base de données complète.
-- Seeders et migrations fournis pour initialiser la base (`DatabaseSeeder`, `AdminUserSeeder`).
-- Authentification prête à l'emploi via Fortify (fichiers et provider présents).
-- Assets modernes (Vite, CSS et JS), responsive et optimisés pour mobile.
-- Tests unitaires et fonctionnels avec Pest/PHPUnit.
-- Bonnes pratiques SEO de base et structure des templates Blade pour adaptation.
+- Catalogue vitrine avec pages d'accueil et d'accessoires
+- Fiches produit par slug avec affichage de détail produit
+- Pages de contenu marketing : à propos, contact, livraison, guide des tailles, mentions légales, etc.
+- Panier avec ajout, retrait, quantités et codes promotionnels
+- Processus de commande avec validation et confirmation
+- Système d'avis produits enregistrés en base
+- Back-office admin avec gestion des :
+  - produits
+  - catégories
+  - commandes et statuts
+  - promotions
+  - statistiques
+- Données de démonstration via `app/Support/DemoData.php`
+- Authentification gérée par Laravel Fortify et contrôle d'accès admin
+
+## Structure du projet
+
+```text
+app/
+  Http/Controllers/
+  Http/Middleware/
+  Models/
+  Providers/
+  Support/
+config/
+database/
+public/
+resources/
+routes/
+tests/
+```
 
 ## Prérequis
 
-- PHP >= 8.1
+- PHP >= 8.3
 - Composer
-- Node.js >= 16 et npm/yarn
-- Une base de données (MySQL, MariaDB, SQLite...)
+- Node.js >= 18
+- npm
+- Une base de données compatible Laravel
 
-## Installation (locale)
+## Installation locale
 
 1. Cloner le dépôt :
 
@@ -46,66 +70,106 @@ cp .env.example .env
 php artisan key:generate
 ```
 
-3. Configurer la base de données dans le fichier `.env`, puis lancer les migrations et (optionnel) les seeders :
+3. Configurer la base de données dans le fichier `.env`.
+
+4. Lancer les migrations et les seeders nécessaires :
 
 ```bash
 php artisan migrate
-php artisan db:seed --class=DatabaseSeeder
+php artisan db:seed
 ```
 
-Si vous souhaitez créer l'utilisateur administrateur fourni par le seeder :
+Pour créer un compte administrateur :
 
 ```bash
 php artisan db:seed --class=AdminUserSeeder
 ```
 
-4. Installer et compiler les assets :
+5. Installer les dépendances front :
 
 ```bash
 npm install
-npm run dev   # ou `npm run build` pour production
+npm run dev
 ```
 
-5. Lancer l'application :
+6. Démarrer l'application :
 
 ```bash
 php artisan serve
-# ou utiliser Sail / Docker si configuré
 ```
 
-Ouvrir le site : http://localhost:8000 et le back-office : http://localhost:8000/admin
+Puis ouvrir :
+- site : http://localhost:8000
+- back-office : http://localhost:8000/admin
 
-## Configuration importante
+## Commandes utiles
 
-- Variables à renseigner dans `.env` : `DB_*`, `MAIL_*`, `APP_URL`, `KKIAPAY_*` (si utilisation de Kkiapay).
-- Le code contient `app/Support/DemoData.php` pour faciliter le développement sans base de données complète ; en production, utilisez les migrations et modèles Eloquent.
-
-## Tests
-
-Exécuter la suite de tests :
+### Développement
 
 ```bash
-composer test # ou vendor/bin/pest
+npm run dev
+php artisan serve
 ```
 
-## Développement et contribution
+### Production
 
-- Respecter les conventions PSR et le style du code existant.
-- Ouvrir une branche par fonctionnalité : `feature/xxx`.
-- Créer une MR/PR avec une description claire et les étapes pour tester.
+```bash
+npm run build
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+```
 
-## Accès admin
+### Tests
 
-Le seeder `database/seeders/AdminUserSeeder.php` permet de créer un compte administrateur pour accéder à `/admin`. Lancer le seeder après les migrations pour générer l'utilisateur.
+```bash
+composer test
+# ou
+php artisan test
+```
+
+### Script de setup rapide
+
+Le projet propose aussi une commande d'installation complète :
+
+```bash
+composer run setup
+```
+
+## Variables d'environnement
+
+À renseigner dans `.env` selon votre environnement :
+
+- `DB_CONNECTION`, `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`
+- `APP_URL`
+- `MAIL_*`
+- `SESSION_DRIVER`
+
+## Sécurité et accès admin
+
+L'application utilise Laravel Fortify pour l'authentification et appelle le middleware `admin` sur le back-office. Le compte administrateur peut être généré via le seeder dédié puis utilisé sur la route `/admin`.
 
 ## Déploiement
 
-- Compiler les assets (`npm run build`), exécuter les migrations, configurer la gestion des queues et des tâches planifiées (cron) et sécuriser les variables d'environnement.
+Pour un déploiement fiable :
+
+- exécuter `npm run build`
+- lancer les migrations sur l'environnement cible
+- sécuriser les variables d'environnement
+- configurer la gestion des files de tâches si nécessaire
+- vérifier les accès administrateurs et les permissions
+
+## Contribution
+
+- créer une branche dédiée par fonctionnalité
+- suivre le style du projet et les conventions Laravel
+- documenter les changements importants
+- tester avant soumission
 
 ## Licence
 
-Voir le fichier `LICENSE` (si présent) ou demander à l'équipe juridique pour le type de licence à appliquer.
+Ce projet est livré avec la licence MIT par défaut du skeleton Laravel, sauf précision contraire dans le dépôt.
 
 ## Contact
 
-Pour toute question technique, ouvrir une issue dans le dépôt ou contacter l'équipe de développement.
+Pour toute demande ou signalement, ouvrir une issue dans le dépôt ou contacter l'équipe de développement.

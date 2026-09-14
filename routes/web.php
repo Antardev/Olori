@@ -6,6 +6,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\ReviewController;
 use App\Support\DemoData;
 
 /*
@@ -13,8 +14,8 @@ use App\Support\DemoData;
 | Routes du site — LA MAISON
 |--------------------------------------------------------------------------
 | Partie vitrine, catégories, espace client et back-office.
-| Les routes POST sont des démonstrations (session), à brancher sur la
-| base de données et KKiaPay en production.
+| Les parcours panier et commande utilisent encore la session; les avis
+| sont persistés en base de données.
 */
 
 // Vitrine et fiches produit
@@ -52,6 +53,8 @@ Route::controller(CheckoutController::class)->group(function () {
     Route::post('/commande', 'store')->name('checkout.store');
     Route::get('/commande/confirmation', 'confirmation')->name('checkout.confirmation');
 });
+
+Route::post('/avis', [ReviewController::class, 'store'])->name('reviews.store');
 
 
 // Authentification — les routes login / register / logout / password.* sont

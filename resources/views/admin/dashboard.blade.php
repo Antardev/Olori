@@ -20,7 +20,7 @@
     <div class="kpi">
         <div class="kpi-top">
             <span class="kpi-icon terra"><span class="material-symbols-outlined">payments</span></span>
-            <span class="trend up"><span class="material-symbols-outlined">trending_up</span> +12 %</span>
+            @include('admin.partials.trend', ['value' => $kpis['ventes_tendance']])
         </div>
         <div class="value">{{ number_format($kpis['ventes'] / 1000000, 2, ',') }} M FCFA</div>
         <div class="label">Ventes du mois</div>
@@ -28,23 +28,23 @@
     <div class="kpi">
         <div class="kpi-top">
             <span class="kpi-icon green"><span class="material-symbols-outlined">shopping_bag</span></span>
-            <span class="trend up"><span class="material-symbols-outlined">trending_up</span> +5</span>
+            @include('admin.partials.trend', ['value' => $kpis['commandes_tendance']])
         </div>
         <div class="value">{{ $kpis['commandes'] }}</div>
         <div class="label">Commandes</div>
     </div>
     <div class="kpi">
         <div class="kpi-top">
-            <span class="kpi-icon rose"><span class="material-symbols-outlined">visibility</span></span>
-            <span class="trend up"><span class="material-symbols-outlined">trending_up</span> +18 %</span>
+            <span class="kpi-icon rose"><span class="material-symbols-outlined">group</span></span>
+            @include('admin.partials.trend', ['value' => $kpis['clients_tendance']])
         </div>
-        <div class="value">{{ number_format($kpis['visites'], 0, ',', ' ') }}</div>
-        <div class="label">Visites</div>
+        <div class="value">{{ number_format($kpis['clients'], 0, ',', ' ') }}</div>
+        <div class="label">Clients</div>
     </div>
     <div class="kpi">
         <div class="kpi-top">
             <span class="kpi-icon sable"><span class="material-symbols-outlined">shopping_cart</span></span>
-            <span class="trend flat"><span class="material-symbols-outlined">trending_flat</span> stable</span>
+            @include('admin.partials.trend', ['value' => $kpis['panier_tendance']])
         </div>
         <div class="value">{{ number_format($kpis['panier_moyen'], 0, ',', ' ') }} FCFA</div>
         <div class="label">Panier moyen</div>

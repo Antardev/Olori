@@ -38,7 +38,7 @@
                 <a class="mobile-nav-link {{ request()->routeIs('contact') ? 'active' : '' }}" href="{{ route('contact') }}">Contact</a>
         </nav>
         <a class="brand" href="{{ route('home') }}">
-            <img class="brand-logo" src="{{ asset('images/ooo-removebg-preview.png') }}" alt="LA MAISON — Olori">
+            <img class="brand-logo" src="{{ asset('images/olori.png') }}" alt="LA MAISON — Olori">
         </a>
         <nav class="nav nav-right" aria-label="Navigation secondaire">
 
@@ -93,7 +93,7 @@
 <footer class="site-footer">
     <div class="inner">
         <div>
-            <img class="brand-logo footer-logo" src="{{ asset('images/ooo-removebg-preview.png') }}" alt="LA MAISON — Olori">
+            <img class="brand-logo footer-logo" src="{{ asset('images/olori.png') }}" alt="LA MAISON — Olori">
             <p>Maison de mode béninoise. Élégance, authenticité et savoir-faire, de Cotonou au monde entier.</p>
         </div>
         <div>

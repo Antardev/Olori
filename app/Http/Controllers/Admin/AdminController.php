@@ -18,12 +18,55 @@ class AdminController extends Controller
 {
     public function dashboard()
     {
+        $monthStart = now()->startOfMonth();
+        $previousMonthStart = $monthStart->copy()->subMonth();
+        $previousMonthEnd = $monthStart->copy()->subSecond();
+        $salesStatuses = ['en_attente', 'expediee', 'livree'];
+
+        $currentOrders = Order::query()
+            ->whereIn('status', $salesStatuses)
+            ->where('created_at', '>=', $monthStart);
+        $previousOrders = Order::query()
+            ->whereIn('status', $salesStatuses)
+            ->whereBetween('created_at', [$previousMonthStart, $previousMonthEnd]);
+
+        $sales = (clone $currentOrders)->sum('total');
+        $ordersCount = (clone $currentOrders)->count();
+        $customersCount = (clone $currentOrders)->distinct('email')->count('email');
+        $averageOrder = $ordersCount ? (int) round($sales / $ordersCount) : 0;
+
         return view('admin.dashboard', [
-            'orders'    => DemoData::orders(),
-            'statuses'  => DemoData::statuses(),
+            'orders'    => Order::latest()->take(5)->get(),
+            'statuses'  => Order::STATUSES,
             'lowStock'  => Product::published()->where('stock', '<=', 2)->orderBy('stock')->get(),
-            'kpis'      => ['ventes' => 1240000, 'commandes' => 47, 'visites' => 3210, 'panier_moyen' => 26400],
+            'kpis'      => [
+                'ventes' => $sales,
+                'commandes' => $ordersCount,
+                'clients' => $customersCount,
+                'panier_moyen' => $averageOrder,
+                'ventes_tendance' => $this->percentageChange($sales, (clone $previousOrders)->sum('total')),
+                'commandes_tendance' => $this->percentageChange($ordersCount, (clone $previousOrders)->count()),
+                'clients_tendance' => $this->percentageChange(
+                    $customersCount,
+                    (clone $previousOrders)->distinct('email')->count('email')
+                ),
+                'panier_tendance' => $this->percentageChange(
+                    $averageOrder,
+                    ($previousOrders->count() > 0)
+                        ? (int) round($previousOrders->sum('total') / $previousOrders->count())
+                        : 0
+                ),
+            ],
         ]);
+    }
+
+    private function percentageChange(int $current, int $previous): ?int
+    {
+        if ($previous === 0) {
+            return $current === 0 ? 0 : null;
+        }
+
+        return (int) round(($current - $previous) / $previous * 100);
     }
 
     public function products()
@@ -229,12 +272,55 @@ class AdminController extends Controller
 
     public function stats()
     {
+        $salesStatuses = ['en_attente', 'expediee', 'livree'];
+        $periodStart = now()->startOfMonth()->subMonths(5);
+        $monthly = collect(range(5, 0))->map(function (int $monthsAgo) use ($salesStatuses) {
+            $month = now()->startOfMonth()->subMonths($monthsAgo);
+
+            return [
+                'mois' => ucfirst($month->translatedFormat('F')),
+                'ca' => Order::whereIn('status', $salesStatuses)
+                    ->whereBetween('created_at', [$month, $month->copy()->endOfMonth()])
+                    ->sum('total'),
+            ];
+        })->all();
+
+        $orders = Order::whereIn('status', $salesStatuses)
+            ->where('created_at', '>=', $periodStart)
+            ->get(['items', 'total']);
+        $soldProducts = [];
+
+        foreach ($orders as $order) {
+            foreach ($order->items ?? [] as $item) {
+                $product = $item['product'] ?? [];
+                $productId = $product['id'] ?? $product['slug'] ?? $product['name'] ?? 'inconnu';
+                $quantity = (int) ($item['qty'] ?? 0);
+                $price = (int) ($product['price'] ?? 0);
+
+                if (! isset($soldProducts[$productId])) {
+                    $soldProducts[$productId] = [
+                        'name' => $product['name'] ?? 'Article supprimé',
+                        'price' => $price,
+                        'quantity' => 0,
+                        'revenue' => 0,
+                    ];
+                }
+
+                $soldProducts[$productId]['quantity'] += $quantity;
+                $soldProducts[$productId]['revenue'] += $price * $quantity;
+            }
+        }
+
+        $top = collect($soldProducts)->sortByDesc('quantity')->take(5)->values();
+
         return view('admin.stats', [
-            'top' => Product::published()->orderByDesc('reviews')->take(5)->get(),
-            'monthly' => [
-                ['mois' => 'Février', 'ca' => 680000], ['mois' => 'Mars', 'ca' => 820000],
-                ['mois' => 'Avril', 'ca' => 910000], ['mois' => 'Mai', 'ca' => 1050000],
-                ['mois' => 'Juin', 'ca' => 1180000], ['mois' => 'Juillet', 'ca' => 1240000],
+            'top' => $top,
+            'monthly' => $monthly,
+            'stats' => [
+                'ventes' => collect($monthly)->sum('ca'),
+                'commandes' => $orders->count(),
+                'articles' => $top->sum('quantity'),
+                'panier_moyen' => $orders->count() ? (int) round($orders->sum('total') / $orders->count()) : 0,
             ],
         ]);
     }

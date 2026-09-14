@@ -67,7 +67,7 @@
                     <span class="label">{{ $label }}</span>
                 </a>
             @endforeach
-          
+
         </div>
     </div>
 </section>
@@ -100,14 +100,14 @@
             </div>
             <div class="chiffre">
                 <span class="valeur">1200<sup>+</sup></span>
-                <span class="libelle">Clientes et clients</span>
+                <span class="libelle">Client</span>
             </div>
             <div class="chiffre">
                 <span class="valeur">4,9<sup>/5</sup></span>
                 <span class="libelle">Note moyenne</span>
             </div>
             <div class="chiffre">
-                <span class="valeur">15</span>
+                <span class="valeur">5</span>
                 <span class="libelle">Pays de livraison</span>
             </div>
         </div>
@@ -122,28 +122,54 @@
             @include('partials.wax-rule', ['serre' => true])
         </div>
         <div class="temoignages">
-            <figure class="temoignage">
-                <div class="etoiles" aria-label="5 étoiles sur 5">
-                    @for($i = 0; $i < 5; $i++)<span class="material-symbols-outlined">star</span>@endfor
+            @forelse($avis as $review)
+                <figure class="temoignage">
+                    <div class="etoiles" aria-label="{{ $review->rating }} étoiles sur 5">
+                        @for($i = 1; $i <= 5; $i++)
+                            <span class="material-symbols-outlined">{{ $i <= $review->rating ? 'star' : 'star_border' }}</span>
+                        @endfor
+                    </div>
+                    <blockquote>{{ $review->comment }}</blockquote>
+                    <figcaption><span class="nom">{{ $review->name }}</span>@if($review->city)<span class="ville">{{ $review->city }}</span>@endif</figcaption>
+                </figure>
+            @empty
+                <p class="empty-state">Soyez la première personne à partager votre expérience.</p>
+            @endforelse
+        </div>
+        <div class="avis-form">
+            <div>
+                <span class="eyebrow">Votre expérience</span>
+                <h3>Partagez votre avis</h3>
+            </div>
+            @if($errors->any())
+                <div class="alert" role="alert">{{ $errors->first() }}</div>
+            @endif
+            <form method="POST" action="{{ route('reviews.store') }}">
+                @csrf
+                <div class="form-grid">
+                    <div class="field">
+                        <label for="review-name">Nom</label>
+                        <input id="review-name" name="name" type="text" value="{{ old('name') }}" required maxlength="80">
+                    </div>
+                    <div class="field">
+                        <label for="review-city">Ville <span>(facultatif)</span></label>
+                        <input id="review-city" name="city" type="text" value="{{ old('city') }}" maxlength="80">
+                    </div>
+                    <div class="field">
+                        <label for="review-rating">Note</label>
+                        <select id="review-rating" name="rating" required>
+                            @for($rating = 5; $rating >= 1; $rating--)
+                                <option value="{{ $rating }}" @selected((int) old('rating', 5) === $rating)>{{ $rating }} étoile{{ $rating > 1 ? 's' : '' }}</option>
+                            @endfor
+                        </select>
+                    </div>
+                    <div class="field full">
+                        <label for="review-comment">Votre commentaire</label>
+                        <textarea id="review-comment" name="comment" rows="4" minlength="10" maxlength="1000" required>{{ old('comment') }}</textarea>
+                    </div>
                 </div>
-                <blockquote>Une robe magnifique, des tissus de qualité et une finition parfaite. Je suis ravie de ma commande.</blockquote>
-                <figcaption><span class="nom">Amina C.</span><span class="ville">Cotonou</span></figcaption>
-            </figure>
-            <figure class="temoignage">
-                <div class="etoiles" aria-label="5 étoiles sur 5">
-                    @for($i = 0; $i < 5; $i++)<span class="material-symbols-outlined">star</span>@endfor
-                </div>
-                <blockquote>Le chemisier correspond parfaitement aux photos. Livraison rapide et service client au top.</blockquote>
-                <figcaption><span class="nom">Paul K.</span><span class="ville">Porto-Novo</span></figcaption>
-            </figure>
-            <figure class="temoignage">
-                <div class="etoiles" aria-label="4 étoiles et demie sur 5">
-                    @for($i = 0; $i < 4; $i++)<span class="material-symbols-outlined">star</span>@endfor
-                    <span class="material-symbols-outlined">star_half</span>
-                </div>
-                <blockquote>J'adore le style unique des collections. Ça change des grandes enseignes, on sent le savoir-faire local.</blockquote>
-                <figcaption><span class="nom">Sophie B.</span><span class="ville">Abidjan</span></figcaption>
-            </figure>
+                <button class="btn btn-terra" type="submit">Publier mon avis</button>
+            </form>
         </div>
     </div>
 </section>

@@ -25,7 +25,7 @@
             </button>
         </div>
         <a class="brand" href="{{ route('admin.dashboard') }}">
-            <img class="brand-logo" src="{{ asset('images/ooo-removebg-preview.png') }}" alt="OLÒRI — Made in Benin">
+            <img class="brand-logo" src="{{ asset('images/olori.png') }}" alt="OLÒRI — Made in Benin">
         </a>
         <span class="section-label">Boutique</span>
         <a class="item d-flex align-items-center gap-2 {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}"><i class="bi bi-grid-1x2" aria-hidden="true"></i> Tableau de bord</a>

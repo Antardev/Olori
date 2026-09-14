@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\Review;
 use App\Support\DemoData;
 use Illuminate\Http\Request;
 
@@ -15,6 +16,7 @@ class ShopController extends Controller
             'nouveautes' => Product::published()->where('badge', 'Nouveau')->latest()->take(4)->get(),
             'selection'  => Product::published()->latest()->take(4)->get(),
             'categories' => DemoData::categories(),
+            'avis'       => Review::published()->orderByDesc('rating')->latest()->take(3)->get(),
         ]);
     }
 
