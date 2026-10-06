@@ -30,13 +30,13 @@
     <div class="inner">
         <div class="item">
             <span class="material-symbols-outlined">local_shipping</span>
-            <strong>Livraison Bénin &amp; international</strong>
+            <strong>braison Bénin &amp; international</strong>
             <span>Suivi de commande en temps réel</span>
         </div>
         <div class="item">
             <span class="material-symbols-outlined">verified_user</span>
             <strong>Paiement sécurisé</strong>
-            <span>KKiaPay — Mobile Money, carte bancaire</span>
+            <span>Mobile Money, carte bancaire</span>
         </div>
         <div class="item">
             <span class="material-symbols-outlined">autorenew</span>
@@ -58,7 +58,7 @@
         <div class="cat-grid">
             @foreach($categories as $slug => $label)
                 @php($catMeta = \App\Support\DemoData::categoryMeta($slug))
-                <a class="cat-card" href="{{ route('shop.category', $slug) }}">
+                <a class="cat-card cat-card-{{ $slug }}" href="{{ route('shop.category', $slug) }}">
                     @if($catMeta['image'])
                         <img class="cat-img" src="{{ asset($catMeta['image']) }}" alt="{{ $label }}" loading="lazy">
                     @else
@@ -183,7 +183,7 @@
         <span class="eyebrow">Notre histoire</span>
         <h2>Chaque pièce raconte un savoir-faire <em>transmis de main en main</em>.</h2>
         <p>Découvrez l'univers de la maison, ses valeurs et ses artisanes partenaires.</p>
-        <a class="btn btn-clair" href="{{ route('about') }}">À propos de la maison</a>
+        <a class="btn btn-clair" href="{{ route('about') }}">À propos de nous</a>
     </div>
 </section>
 

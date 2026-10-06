@@ -96,7 +96,7 @@
                             @if($product['description'])
                                 <p>{{ $product['description'] }}</p>
                             @endif
-                            <p>Lavage à la main recommandé, repassage doux sur l'envers.</p>
+                            {{-- <p>Lavage à la main recommandé, repassage doux sur l'envers.</p> --}}
                         </div>
                     </details>
                     <details>
@@ -118,7 +118,7 @@
                     <h2>Produits similaires</h2>
                 </div>
             </div>
-            <div class="product-grid trois">
+            <div class="product-grid">
                 @foreach($similaires as $p)
                     @include('shop._card', ['p' => $p])
                 @endforeach

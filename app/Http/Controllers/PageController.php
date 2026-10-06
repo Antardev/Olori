@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Product;
 use Illuminate\Http\Request;
 
 class PageController extends Controller
@@ -28,13 +29,9 @@ class PageController extends Controller
 
     public function view360()
     {
-        // Chaque séquence : slug, titre, dossier des frames, nombre de vues.
-        $sets = [
-            ['slug' => 'robe-signature', 'title' => 'Robe Signature', 'frames' => 24],
-            ['slug' => 'robe-ife',       'title' => 'Robe Ifè',       'frames' => 24],
-        ];
+        $products = Product::published()->latest()->get();
 
-        return view('pages.view360', ['sets' => $sets]);
+        return view('pages.view360', ['products' => $products]);
     }
 
     public function send(Request $request)

@@ -79,9 +79,18 @@ class AdminController extends Controller
 
     public function productForm()
     {
+        $subcategories = Category::query()
+            ->orderBy('collection')
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->get()
+            ->groupBy('collection')
+            ->map(fn ($categories) => $categories->pluck('name', 'slug'))
+            ->toArray();
+
         return view('admin.product-form', [
-            'categories' => DemoData::categories(),
-            'subcategories' => DemoData::subcategories(),
+            'categories'    => DemoData::categories(),
+            'subcategories' => $subcategories,
             'badges'     => Product::BADGES,
         ]);
     }
@@ -247,25 +256,38 @@ class AdminController extends Controller
 
     public function promotions()
     {
-        return view('admin.promotions', ['promotions' => Promotion::latest()->get()]);
+        return view('admin.promotions', [
+            'promotions' => Promotion::with('products:id,name')->latest()->get(),
+            'products' => Product::orderBy('name')->get(['id', 'name']),
+        ]);
     }
 
     public function storePromotion(StorePromotionRequest $request)
     {
-        Promotion::create([
-            ...$request->validated(),
+        $data = $request->validated();
+        $productIds = $data['product_ids'] ?? [];
+        unset($data['product_ids']);
+
+        $promotion = Promotion::create([
+            ...$data,
             'is_active' => $request->boolean('is_active', true),
         ]);
+        $promotion->products()->sync($productIds);
 
         return redirect()->route('admin.promotions')->with('status', 'Le code promotionnel a été créé.');
     }
 
     public function updatePromotion(StorePromotionRequest $request, Promotion $promotion)
     {
+        $data = $request->validated();
+        $productIds = $data['product_ids'] ?? [];
+        unset($data['product_ids']);
+
         $promotion->update([
-            ...$request->validated(),
+            ...$data,
             'is_active' => $request->boolean('is_active'),
         ]);
+        $promotion->products()->sync($productIds);
 
         return redirect()->route('admin.promotions')->with('status', 'Le code promotionnel a été modifié.');
     }
@@ -325,4 +347,3 @@ class AdminController extends Controller
         ]);
     }
 }
-

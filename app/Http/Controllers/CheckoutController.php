@@ -21,9 +21,9 @@ class CheckoutController extends Controller
 
         $shipping = 1500;
         $promotion = CartController::promotion($request);
-        $discount = $promotion ? (int) floor($subtotal * $promotion->discount_percent / 100) : 0;
+        [$items, $discount, $hasEligibleItems] = CartController::applyPromotionToItems($items, $promotion);
 
-        return view('checkout.index', compact('items', 'subtotal', 'shipping', 'discount', 'promotion'));
+        return view('checkout.index', compact('items', 'subtotal', 'shipping', 'discount', 'promotion', 'hasEligibleItems'));
     }
 
     public function store(Request $request)
@@ -48,10 +48,11 @@ class CheckoutController extends Controller
         if ($promoCode && ! $promotion) {
             return redirect()->route('cart.index')->withErrors(['promo_code' => 'Le code promo a expiré ou n’est plus actif.']);
         }
-        $discount = $promotion ? (int) floor($subtotal * $promotion->discount_percent / 100) : 0;
+        [$items, $discount, $hasEligibleItems] = CartController::applyPromotionToItems($items, $promotion);
+        $appliedPromotion = $hasEligibleItems ? $promotion : null;
 
         $shipping = 1500;
-        $order = DB::transaction(function () use ($items, $data, $request, $promotion, $subtotal, $discount, $shipping) {
+        $order = DB::transaction(function () use ($items, $data, $request, $appliedPromotion, $subtotal, $discount, $shipping) {
             foreach ($items as $item) {
                 $quantity = (int) $item['qty'];
                 $product = Product::query()->lockForUpdate()->find($item['product']->id);
@@ -75,7 +76,7 @@ class CheckoutController extends Controller
                 'city' => $data['city'],
                 'zone' => 'cotonou',
                 'payment_method' => 'kkiapay',
-                'promotion_code' => $promotion?->code,
+                'promotion_code' => $appliedPromotion?->code,
                 'status' => 'en_attente',
                 'subtotal' => $subtotal,
                 'discount' => $discount,
@@ -84,8 +85,8 @@ class CheckoutController extends Controller
                 'items' => $items,
             ]);
 
-            if ($promotion) {
-                $promotion->increment('uses_count');
+            if ($appliedPromotion) {
+                $appliedPromotion->increment('uses_count');
             }
 
             return $order;

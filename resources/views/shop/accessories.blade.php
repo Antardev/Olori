@@ -16,32 +16,28 @@
 
 <section class="section">
     <div class="container">
-        {{-- <nav class="cat-switch" aria-label="Collections">
+        <nav class="cat-switch" aria-label="Collections">
             <a href="{{ route('shop.category', 'hommes') }}">Hommes</a>
             <a href="{{ route('shop.category', 'femmes') }}">Femmes</a>
             <a href="{{ route('shop.accessories') }}" class="active">Accessoires</a>
-        </nav> --}}
+        </nav>
 
-        <div class="shop-layout">
-            <aside class="filters">
-                <h3>Filtrer</h3>
-                <div class="field">
-                    <span class="form-label">Pour qui ?</span>
-                    <div class="filter-links">
-                        <a href="{{ route('shop.accessories') }}" class="{{ !in_array($gender, ['hommes', 'femmes', 'mixtes'], true) ? 'active' : '' }}">Mixte</a>
-                        <a href="{{ route('shop.accessories', ['genre' => 'hommes']) }}" class="{{ $gender === 'hommes' ? 'active' : '' }}">Hommes</a>
-                        <a href="{{ route('shop.accessories', ['genre' => 'femmes']) }}" class="{{ $gender === 'femmes' ? 'active' : '' }}">Femmes</a>
-                        <a href="{{ route('shop.accessories', ['genre' => 'mixtes']) }}" class="{{ $gender === 'mixtes' ? 'active' : '' }}">Mixtes</a>
-                    </div>
-                </div>
-            </aside>
+        <div class="accessories-filter">
+            <span class="category-filter-label">Pour qui ?</span>
+            <div class="filter-links">
+                <a href="{{ route('shop.accessories') }}" class="{{ !in_array($gender, ['hommes', 'femmes', 'mixtes'], true) ? 'active' : '' }}">Mixte</a>
+                <a href="{{ route('shop.accessories', ['genre' => 'hommes']) }}" class="{{ $gender === 'hommes' ? 'active' : '' }}">Hommes</a>
+                <a href="{{ route('shop.accessories', ['genre' => 'femmes']) }}" class="{{ $gender === 'femmes' ? 'active' : '' }}">Femmes</a>
+                <a href="{{ route('shop.accessories', ['genre' => 'mixtes']) }}" class="{{ $gender === 'mixtes' ? 'active' : '' }}">Mixtes</a>
+            </div>
+        </div>
 
-            <div>
+        <div>
                 <div class="toolbar">
                     <span>{{ count($products) }} accessoire{{ count($products) > 1 ? 's' : '' }}</span>
                 </div>
                 @if(count($products))
-                    <div class="product-grid trois">
+                    <div class="product-grid quatre">
                         @foreach($products as $p)
                             @include('shop._card', ['p' => $p])
                         @endforeach
@@ -49,7 +45,6 @@
                 @else
                     <p>Aucun accessoire ne correspond à ce filtre.</p>
                 @endif
-            </div>
         </div>
     </div>
 </section>

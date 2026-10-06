@@ -26,7 +26,12 @@
                                     <td><a href="{{ route('shop.show', $item['product']['slug']) }}">{{ $item['product']['name'] }}</a></td>
                                     <td>{{ number_format($item['product']['price'], 0, ',', ' ') }} FCFA</td>
                                     <td>{{ $item['qty'] }}</td>
-                                    <td><strong>{{ number_format($item['line'], 0, ',', ' ') }} FCFA</strong></td>
+                                    <td>
+                                        <strong>{{ number_format($item['discounted_line'], 0, ',', ' ') }} FCFA</strong>
+                                        @if($item['discount'])
+                                            <small class="cart-item-discount">-{{ number_format($item['discount'], 0, ',', ' ') }} FCFA avec le code promo</small>
+                                        @endif
+                                    </td>
                                     <td>
                                         <form method="POST" action="{{ route('cart.remove', $item['product']['slug']) }}">
                                             @csrf
@@ -50,6 +55,9 @@
                         </div>
                         @error('promo_code')<span class="field-error">{{ $message }}</span>@enderror
                     </form>
+                    @if($promotion && !$hasEligibleItems)
+                        <p class="field-error">Ce code ne concerne aucun article de votre panier.</p>
+                    @endif
                     <div class="row"><span>Sous-total</span><span>{{ number_format($subtotal, 0, ',', ' ') }} FCFA</span></div>
                     @if($discount)
                         <div class="row"><span>Remise ({{ $promotion->code }})</span><span>-{{ number_format($discount, 0, ',', ' ') }} FCFA</span></div>

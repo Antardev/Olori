@@ -38,8 +38,18 @@
             <aside class="summary">
                 <h3 style="margin-bottom:14px">Votre commande</h3>
                 @foreach($items as $item)
-                    <div class="row"><span>{{ $item['product']['name'] }} × {{ $item['qty'] }}</span><span>{{ number_format($item['line'], 0, ',', ' ') }} FCFA</span></div>
+                    <div class="row">
+                        <span>{{ $item['product']['name'] }} × {{ $item['qty'] }}</span>
+                        <span>{{ number_format($item['discounted_line'], 0, ',', ' ') }} FCFA
+                            @if($item['discount'])
+                                <small class="cart-item-discount">(-{{ number_format($item['discount'], 0, ',', ' ') }} FCFA)</small>
+                            @endif
+                        </span>
+                    </div>
                 @endforeach
+                @if($promotion && !$hasEligibleItems)
+                    <p class="field-error">Ce code ne concerne aucun article de votre panier.</p>
+                @endif
                 <div class="row"><span>Livraison</span><span>{{ number_format($shipping, 0, ',', ' ') }} FCFA</span></div>
                 @if($discount)
                     <div class="row"><span>Remise{{ $promotion ? ' ('.$promotion->code.')' : '' }}</span><span>-{{ number_format($discount, 0, ',', ' ') }} FCFA</span></div>

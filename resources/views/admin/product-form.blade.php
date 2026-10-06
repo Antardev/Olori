@@ -14,6 +14,11 @@
 @if($errors->any())
     <div class="alert alert-error">
         <strong>{{ $errors->count() }} champ{{ $errors->count() > 1 ? 's' : '' }} à corriger avant publication.</strong>
+        <ul>
+            @foreach($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
     </div>
 @endif
 

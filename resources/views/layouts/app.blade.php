@@ -14,7 +14,7 @@
 </head>
 <body>
 
-<div class="topbar">Livraison offerte à Cotonou dès 50 000 FCFA — Paiement sécurisé KKiaPay</div>
+<div class="topbar">Livraison offerte à Cotonou dès 50 000 FCFA - Paiement sécurisé </div>
 
 <header class="site-header">
     <div class="inner">
@@ -24,21 +24,21 @@
         <nav class="nav nav-left" aria-label="Navigation principale">
             <a href="{{ route('home') }}" class="{{ request()->routeIs('home') ? 'active' : '' }}">Accueil</a>
             {{-- <a href="{{ route('shop.accessories') }}" class="{{ request()->routeIs('shop.accessories') ? 'active' : '' }}">Accessoires</a> --}}
-            <details class="nav-dropdown">
-                <summary>Collection</summary>
+            <div class="nav-dropdown">
+                <span class="nav-dropdown-label" tabindex="0">Collection</span>
                 <div class="nav-dropdown-menu">
                     @foreach(\App\Support\DemoData::categories() as $catSlug => $catLabel)
                         <a href="{{ route('shop.category', $catSlug) }}" class="{{ request()->routeIs('shop.category') && request()->route('categorie') === $catSlug ? 'active' : '' }}">{{ $catLabel }}</a>
                     @endforeach
 
                 </div>
-            </details>
+            </div>
      <a href="{{ route('view360') }}" class="{{ request()->routeIs('view360') ? 'active' : '' }}">Galerie</a>
                 <a class="mobile-nav-link {{ request()->routeIs('about') ? 'active' : '' }}" href="{{ route('about') }}">À propos</a>
                 <a class="mobile-nav-link {{ request()->routeIs('contact') ? 'active' : '' }}" href="{{ route('contact') }}">Contact</a>
         </nav>
         <a class="brand" href="{{ route('home') }}">
-            <img class="brand-logo" src="{{ asset('images/olori.png') }}" alt="LA MAISON — Olori">
+            <img class="brand-logo" src="{{ asset('images/olori.png') }}" alt="Olori">
         </a>
         <nav class="nav nav-right" aria-label="Navigation secondaire">
 

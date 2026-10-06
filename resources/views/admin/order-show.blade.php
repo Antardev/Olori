@@ -52,7 +52,15 @@
                     <td>{{ $item['product']['name'] ?? 'Article supprimé' }}</td>
                     <td>{{ $item['qty'] ?? 0 }}</td>
                     <td>{{ number_format($item['product']['price'] ?? 0, 0, ',', ' ') }} FCFA</td>
-                    <td>{{ number_format($item['line'] ?? 0, 0, ',', ' ') }} FCFA</td>
+                    <td>
+                        @if(!empty($item['discount']))
+                            <s>{{ number_format($item['line'] ?? 0, 0, ',', ' ') }} FCFA</s><br>
+                            <strong>{{ number_format($item['discounted_line'] ?? $item['line'] ?? 0, 0, ',', ' ') }} FCFA</strong>
+                            <small>(-{{ number_format($item['discount'], 0, ',', ' ') }} FCFA)</small>
+                        @else
+                            {{ number_format($item['line'] ?? 0, 0, ',', ' ') }} FCFA
+                        @endif
+                    </td>
                 </tr>
             @endforeach
         </tbody>

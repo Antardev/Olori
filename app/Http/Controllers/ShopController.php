@@ -14,9 +14,9 @@ class ShopController extends Controller
     {
         return view('home', [
             'nouveautes' => Product::published()->where('badge', 'Nouveau')->latest()->take(4)->get(),
-            'selection'  => Product::published()->latest()->take(4)->get(),
+            'selection'  => Product::published()->latest()->take(8)->get(),
             'categories' => DemoData::categories(),
-            'avis'       => Review::published()->orderByDesc('rating')->latest()->take(3)->get(),
+            'avis'       => Review::published()->orderByDesc('rating')->latest()->take(4)->get(),
         ]);
     }
 
@@ -36,10 +36,6 @@ class ShopController extends Controller
 
         if ($subcategory && isset($subcategories[$subcategory])) {
             $query->where('subcategory', $subcategory);
-        }
-
-        if ($max = $request->query('prix_max')) {
-            $query->where('price', '<=', (int) $max);
         }
 
         match ($request->query('tri')) {
@@ -91,7 +87,7 @@ class ShopController extends Controller
             ->category($product->category)
             ->where('id', '!=', $product->id)
             ->latest()
-            ->take(3)
+            ->take(8)
             ->get();
 
         return view('shop.show', compact('product', 'similaires'));

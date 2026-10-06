@@ -68,6 +68,25 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
+  // Filtre horizontal des catégories
+  var categoryFilter = document.querySelector('[data-category-filter]');
+  if (categoryFilter) {
+    var categoryForm = categoryFilter.querySelector('.category-filter-form');
+    var categoryInput = categoryForm.querySelector('input[name="sous_categorie"]');
+    categoryFilter.querySelectorAll('.category-filter-option').forEach(function (option) {
+      option.addEventListener('click', function () {
+        categoryFilter.querySelectorAll('.category-filter-option').forEach(function (item) {
+          item.classList.remove('active');
+          item.setAttribute('aria-pressed', 'false');
+        });
+        option.classList.add('active');
+        option.setAttribute('aria-pressed', 'true');
+        categoryInput.value = option.dataset.categoryValue || '';
+        categoryForm.submit();
+      });
+    });
+  }
+
   // Visualiseur 360°
   var spin = document.getElementById('spin');
   if (spin) initSpin360(spin);

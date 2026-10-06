@@ -33,45 +33,32 @@
             @endforeach
         </nav>
 
-        <div class="shop-layout">
-            <aside class="filters">
-                <h3>Filtrer</h3>
-                <form method="GET" action="{{ route('shop.category', $active) }}">
-                    <div class="field">
-                        <label for="sous_categorie">Catégorie</label>
-                        <select id="sous_categorie" name="sous_categorie">
-                            <option value="">Toutes les catégories</option>
-                            @foreach($subcategories as $slug => $name)
-                                <option value="{{ $slug }}" @selected($subcategory === $slug)>{{ $name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="field">
-                        <label for="prix_max">Prix maximum (FCFA)</label>
-                        <input type="number" id="prix_max" name="prix_max" step="1000" min="0" value="{{ request('prix_max') }}" placeholder="30 000">
-                    </div>
-                    <div class="field">
-                        <label for="tri">Trier par</label>
-                        <select id="tri" name="tri">
-                            <option value="">Pertinence</option>
-                            <option value="prix_asc" @selected(request('tri') === 'prix_asc')>Prix croissant</option>
-                            <option value="prix_desc" @selected(request('tri') === 'prix_desc')>Prix décroissant</option>
-                        </select>
-                    </div>
-                    <button class="btn btn-sm btn-block" type="submit">Appliquer</button>
-                </form>
-
-                @if(request()->hasAny(['sous_categorie', 'prix_max', 'tri']))
-                    <p class="reinit"><a class="lien-souligne" href="{{ route('shop.category', $active) }}">Réinitialiser les filtres</a></p>
+        <div class="category-filter" data-category-filter>
+            <span class="category-filter-label">Catégories</span>
+            <div class="category-filter-list" role="group" aria-label="Filtrer par catégorie">
+                <button type="button" class="category-filter-option {{ ! $subcategory ? 'active' : '' }}" data-category-value="" aria-pressed="{{ ! $subcategory ? 'true' : 'false' }}">
+                    Toutes
+                </button>
+                @foreach($subcategories as $slug => $name)
+                    <button type="button" class="category-filter-option {{ $subcategory === $slug ? 'active' : '' }}" data-category-value="{{ $slug }}" aria-pressed="{{ $subcategory === $slug ? 'true' : 'false' }}">
+                        {{ $name }}
+                    </button>
+                @endforeach
+            </div>
+            <form class="category-filter-form" method="GET" action="{{ route('shop.category', $active) }}">
+                <input type="hidden" name="sous_categorie" value="{{ $subcategory ?? '' }}">
+                @if(request('tri'))
+                    <input type="hidden" name="tri" value="{{ request('tri') }}">
                 @endif
-            </aside>
+            </form>
+        </div>
 
-            <div>
+        <div>
                 <div class="toolbar">
                     <span>{{ count($products) }} article{{ count($products) > 1 ? 's' : '' }}</span>
                 </div>
                 @if(count($products))
-                    <div class="product-grid trois">
+                    <div class="product-grid quatre">
                         @foreach($products as $p)
                             @include('shop._card', ['p' => $p])
                         @endforeach
@@ -79,7 +66,6 @@
                 @else
                     <p>Aucun article ne correspond à ces filtres. <a class="lien-souligne" href="{{ route('shop.category', $active) }}">Voir toute la catégorie {{ $label }}</a></p>
                 @endif
-            </div>
         </div>
     </div>
 </section>

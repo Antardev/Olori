@@ -33,12 +33,7 @@
                     <strong>Réseaux sociaux</strong><br>
                     Instagram · Facebook · TikTok
                 </p>
-                <h3 style="margin-top:22px">FAQ</h3>
-                <div class="accordion">
-                    <details><summary>Quels sont les délais de livraison ?</summary><div class="body">48 h à Cotonou, 3 à 5 jours au Bénin, 7 à 12 jours à l'international.</div></details>
-                    <details><summary>Comment payer ma commande ?</summary><div class="body">Par KKiaPay (Mobile Money, carte bancaire) ou à la livraison à Cotonou.</div></details>
-                    <details><summary>Puis-je retourner un article ?</summary><div class="body">Oui, sous 7 jours après réception, article non porté.</div></details>
-                </div>
+              
             </aside>
         </div>
     </div>

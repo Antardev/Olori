@@ -13,9 +13,9 @@ class CartController extends Controller
         [$items, $subtotal] = $this->cart($request);
         $shipping = $subtotal > 0 ? 1500 : 0; // Zone Cotonou par défaut
         $promotion = $this->promotion($request);
-        $discount = $promotion ? (int) floor($subtotal * $promotion->discount_percent / 100) : 0;
+        [$items, $discount, $hasEligibleItems] = self::applyPromotionToItems($items, $promotion);
 
-        return view('cart.index', compact('items', 'subtotal', 'shipping', 'promotion', 'discount'));
+        return view('cart.index', compact('items', 'subtotal', 'shipping', 'promotion', 'discount', 'hasEligibleItems'));
     }
 
     public function add(Request $request, string $slug)
@@ -48,6 +48,13 @@ class CartController extends Controller
             return back()->withInput()->withErrors(['promo_code' => 'Ce code promo est invalide ou expiré.']);
         }
 
+        [$items] = self::cart($request);
+        [, , $hasEligibleItems] = self::applyPromotionToItems($items, $promotion);
+
+        if (! $hasEligibleItems) {
+            return back()->withInput()->withErrors(['promo_code' => 'Ce code promo ne s’applique à aucun article de votre panier.']);
+        }
+
         $request->session()->put('promo_code', $promotion->code);
 
         return back()->with('status', 'Code promo appliqué.');
@@ -75,6 +82,27 @@ class CartController extends Controller
         }
 
         return $promotion;
+    }
+
+    public static function applyPromotionToItems(array $items, ?Promotion $promotion): array
+    {
+        $discount = 0;
+        $hasEligibleItems = false;
+
+        foreach ($items as &$item) {
+            $isEligible = $promotion && $promotion->appliesTo($item['product']);
+            $lineDiscount = $isEligible
+                ? (int) floor($item['line'] * $promotion->discount_percent / 100)
+                : 0;
+
+            $item['discount'] = $lineDiscount;
+            $item['discounted_line'] = $item['line'] - $lineDiscount;
+            $discount += $lineDiscount;
+            $hasEligibleItems = $hasEligibleItems || (bool) $isEligible;
+        }
+        unset($item);
+
+        return [$items, $discount, $hasEligibleItems];
     }
 
     public static function cart(Request $request): array

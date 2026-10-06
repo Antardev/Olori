@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Promotion extends Model
 {
@@ -23,7 +24,7 @@ class Promotion extends Model
 
     public static function activeByCode(string $code): ?self
     {
-        return static::query()
+        $promotion = static::query()
             ->whereRaw('UPPER(code) = ?', [strtoupper(trim($code))])
             ->where('is_active', true)
             ->where(function ($query) {
@@ -33,6 +34,18 @@ class Promotion extends Model
                 $query->whereNull('ends_at')->orWhereDate('ends_at', '>=', today());
             })
             ->first();
+
+        return $promotion?->load('products:id');
+    }
+
+    public function products(): BelongsToMany
+    {
+        return $this->belongsToMany(Product::class);
+    }
+
+    public function appliesTo(Product $product): bool
+    {
+        return $this->products->isEmpty() || $this->products->contains('id', $product->id);
     }
 
     public function getStatusLabelAttribute(): string
